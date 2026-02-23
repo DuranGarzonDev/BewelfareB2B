@@ -1,0 +1,75 @@
+<div *ngIf="showToast" class="fixed top-5 right-5 z-50 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-3 transition-all duration-300">
+  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+  <span class="font-medium">{{ toastMessage }}</span>
+</div>
+
+<div class="min-h-screen flex">
+  
+  <div class="hidden lg:flex lg:w-1/2 bg-indigo-600 justify-center items-center relative overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-br from-indigo-600 to-purple-800 opacity-90"></div>
+    <div class="z-10 text-center text-white p-10">
+      <h1 class="text-5xl font-bold mb-4">Empieza tu viaje <br> hacia el Bienestar</h1>
+      <p class="text-lg text-indigo-200">Espacio reservado para el diseño personalizado de BWelfare.</p>
+    </div>
+  </div>
+
+  <div class="w-full lg:w-1/2 flex items-center justify-center p-8 bg-gray-50 overflow-y-auto">
+    <div class="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 my-8">
+      
+      <div class="text-center mb-8">
+        <h2 class="text-3xl font-extrabold text-gray-900">Welcome to BWelfare</h2>
+        <p class="text-gray-500 mt-2">Crea tu cuenta para comenzar</p>
+      </div>
+
+      <form class="space-y-5" (ngSubmit)="onSubmit()" #registerForm="ngForm">
+        
+        <div *ngIf="errorMessage" class="bg-red-50 border border-red-400 text-red-600 px-4 py-3 rounded-lg text-sm">
+          {{ errorMessage }}
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Nombre Completo</label>
+          <input type="text" name="fullName" required [(ngModel)]="userData.fullName" class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Correo electrónico</label>
+          <input type="email" name="email" required [(ngModel)]="userData.email" class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Contraseña</label>
+          <div class="mt-1 relative">
+            <input [type]="showPassword ? 'text' : 'password'" name="password" required [(ngModel)]="userData.password" class="block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 pr-10">
+            <button type="button" (click)="togglePassword()" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-indigo-600">
+              <svg *ngIf="!showPassword" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+              <svg *ngIf="showPassword" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" /></svg>
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Confirmar Contraseña</label>
+          <div class="mt-1 relative">
+            <input [type]="showConfirmPassword ? 'text' : 'password'" name="confirmPassword" required [(ngModel)]="confirmPassword" 
+                   [ngClass]="{'border-red-300 focus:ring-red-500 focus:border-red-500': confirmPassword && !passwordsMatch, 'border-green-300 focus:ring-green-500 focus:border-green-500': confirmPassword && passwordsMatch}"
+                   class="block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 pr-10 transition-colors">
+            <button type="button" (click)="toggleConfirmPassword()" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-indigo-600">
+              <svg *ngIf="!showConfirmPassword" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+              <svg *ngIf="showConfirmPassword" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" /></svg>
+            </button>
+          </div>
+          <p *ngIf="confirmPassword && !passwordsMatch" class="mt-1 text-sm text-red-500">Las contraseñas no coinciden.</p>
+        </div>
+
+        <button type="submit" [disabled]="!registerForm.form.valid || !passwordsMatch" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 transition-colors">
+          Registrarse
+        </button>
+      </form>
+
+      <p class="mt-8 text-center text-sm text-gray-600">
+        ¿Ya tienes una cuenta? <a routerLink="/login" class="font-medium text-indigo-600 hover:text-indigo-500">Inicia sesión</a>
+      </p>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  # Base de Datos Relacional (Usuarios, Roles, Auth)
+  postgres-db:
+    image: postgres:15-alpine
+    container_name: bienestar-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: rootpassword
+      POSTGRES_DB: bienestar_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # Base de Datos NoSQL (Encuestas, Logs, Analítica)
+  mongo-db:
+    image: mongo:7.0
+    container_name: bienestar-mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: rootpassword
+      MONGO_INITDB_DATABASE: bienestar_analytics_db
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+volumes:
+  postgres_data:
+  mongo_data:
