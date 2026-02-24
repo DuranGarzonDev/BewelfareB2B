@@ -47,9 +47,9 @@
     </header>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <div class="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-indigo-500 hover:shadow-md transition">
-        <h3 class="text-gray-500 text-sm font-medium uppercase tracking-wider">Pausas Completadas</h3>
-        <p class="text-4xl font-extrabold text-gray-800 mt-2">0</p>
+      <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex-1">
+        <h3 class="text-sm font-bold text-gray-500 mb-1 uppercase tracking-wider">Pausas Completadas</h3>
+        <p class="text-4xl font-black text-slate-800">{{ completedBreaksCount }}</p>
       </div>
       <div class="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-green-500 hover:shadow-md transition">
         <h3 class="text-gray-500 text-sm font-medium uppercase tracking-wider">Racha Actual</h3>
@@ -57,5 +57,75 @@
       </div>
     </div>
     
+    <div class="mt-12">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-gray-800">Pausas Recomendadas</h2>
+        <button class="text-indigo-600 hover:text-indigo-800 font-medium text-sm transition">Ver todas &rarr;</button>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        
+        <div *ngFor="let breakItem of activeBreaks" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col">
+          
+          <div class="h-40 bg-indigo-50 flex justify-center items-center overflow-hidden">
+            <img [src]="breakItem.mediaUrl || 'https://cdn-icons-png.flaticon.com/512/3305/3305803.png'" alt="Imagen de pausa" class="h-24 object-contain drop-shadow-sm transition-transform hover:scale-110 duration-300">
+          </div>
+          
+          <div class="p-6 flex-1 flex flex-col">
+            <div class="flex justify-between items-start mb-2">
+              <span class="bg-indigo-100 text-indigo-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
+                {{ breakItem.category?.name || 'General' }}
+              </span>
+              <span class="flex items-center text-gray-500 text-sm font-medium">
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                {{ breakItem.durationSeconds }}s
+              </span>
+            </div>
+            
+            <h3 class="text-xl font-bold text-gray-900 mb-2">{{ breakItem.title }}</h3>
+            <p class="text-gray-600 text-sm flex-1 line-clamp-3">{{ breakItem.description }}</p>
+            
+            <button (click)="openModal(breakItem)" class="mt-6 w-full py-2.5 bg-indigo-50 hover:bg-indigo-600 text-indigo-700 hover:text-white rounded-xl font-semibold transition-colors duration-300">
+              Iniciar Pausa
+            </button>
+          </div>
+        </div>
+
+        <div *ngIf="activeBreaks.length === 0" class="col-span-full bg-gray-50 rounded-2xl p-8 text-center border-2 border-dashed border-gray-200">
+          <svg class="mx-auto h-12 w-12 text-gray-400 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+          <h3 class="text-lg font-medium text-gray-900">No hay pausas disponibles</h3>
+          <p class="text-gray-500 mt-1">Aún no se han creado pausas activas en la base de datos.</p>
+        </div>
+
+      </div>
+    </div>
+    
   </main>
+</div>
+
+<div *ngIf="isModalOpen" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900 bg-opacity-60 backdrop-blur-sm transition-opacity">
+  <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md p-10 relative flex flex-col items-center text-center transform transition-all">
+    
+    <button (click)="closeModal()" class="absolute top-5 right-5 text-gray-400 hover:text-red-500 transition-colors bg-gray-50 hover:bg-red-50 rounded-full p-2">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+    </button>
+
+    <div class="h-28 w-28 bg-indigo-50 rounded-full flex items-center justify-center mb-6 border-4 border-indigo-100">
+      <img [src]="currentBreak?.mediaUrl || 'https://cdn-icons-png.flaticon.com/512/3305/3305803.png'" alt="Pausa" class="h-16 object-contain">
+    </div>
+    
+    <h2 class="text-2xl font-black text-gray-800 mb-3">{{ currentBreak?.title }}</h2>
+    <p class="text-gray-600 mb-8 leading-relaxed text-sm">{{ currentBreak?.description }}</p>
+
+    <div class="bg-indigo-600 text-white rounded-2xl w-full py-6 mb-6 shadow-inner shadow-indigo-800">
+      <p class="text-sm text-indigo-200 font-medium tracking-widest uppercase mb-1">Tiempo Restante</p>
+      <div class="text-6xl font-black font-mono tracking-tight">
+        00:{{ timeLeft < 10 ? '0' + timeLeft : timeLeft }}
+      </div>
+    </div>
+
+    <button (click)="closeModal()" class="text-sm font-bold text-gray-400 hover:text-gray-700 transition-colors uppercase tracking-wider">
+      Cancelar
+    </button>
+  </div>
 </div>

@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/breaks")
@@ -39,4 +40,34 @@ public class BreakController {
             @RequestParam Long categoryId) {
         return ResponseEntity.ok(breakService.createBreak(activeBreak, categoryId));
     }
+
+    @PostMapping("/{breakId}/complete/{userId}")
+    public ResponseEntity<?> completeBreak(@PathVariable Long breakId, @PathVariable UUID userId) {
+        try {
+            return ResponseEntity.ok(breakService.completeBreak(userId, breakId));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    // 3. Cambiamos Long por UUID aquí
+    @GetMapping("/stats/{userId}")
+    public ResponseEntity<?> getUserStats(@PathVariable UUID userId) {
+        long count = breakService.getCompletedBreaksCount(userId);
+        
+        return ResponseEntity.ok().body(java.util.Map.of(
+            "pausasCompletadas", count,
+            "rachaDias", 0 
+        ));
+    }
+
+    // === RUTA ESPÍA PARA VER LOS UUID DE LOS USUARIOS ===
+    @org.springframework.beans.factory.annotation.Autowired
+    private TuskSyS.bienestar_api.modules.users.repositories.UserRepository userRepository;
+
+    @GetMapping("/spy-users")
+    public ResponseEntity<?> spyUsers() {
+        return ResponseEntity.ok(userRepository.findAll());
+    }
+    
 }

@@ -33,10 +33,11 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .cors(withDefaults()) // <-- ¡ACTIVAMOS EL CORS AQUÍ!
+            .cors(withDefaults())
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**", "/error").permitAll()
+                // ¡AQUÍ ESTÁ EL TRUCO! Le damos permiso temporal a la ruta de breaks
+                .requestMatchers("/api/auth/**", "/api/breaks/**", "/error").permitAll()
                 .anyRequest().authenticated()
             );
         
