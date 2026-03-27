@@ -75,4 +75,10 @@ public class User implements UserDetails { // <-- ¡Nuevo contrato de seguridad!
     public boolean isEnabled() {
         return this.isActive;
     }
+
+    @Column(length = 500)
+    private String bio;
+
+    @Column(length = 1000)
+    private String profilePictureUrl;
 }

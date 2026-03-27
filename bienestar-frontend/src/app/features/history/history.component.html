@@ -23,12 +23,12 @@
     </div>
 
     <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
-      <a routerLink="/dashboard" (click)="isMobileMenuOpen = false" class="block py-3 px-4 rounded-xl bg-red-800 text-white font-bold transition shadow-inner">Inicio</a>
+      <a routerLink="/dashboard" (click)="isMobileMenuOpen = false" class="block py-3 px-4 rounded-xl hover:bg-red-600 text-red-100 font-medium transition-colors">Inicio</a>
       <a routerLink="/profile" (click)="isMobileMenuOpen = false" class="block py-3 px-4 rounded-xl hover:bg-red-600 text-red-100 font-medium transition-colors">Mi Perfil</a>
-      <a routerLink="/history" (click)="isMobileMenuOpen = false" class="block py-3 px-4 rounded-xl hover:bg-red-600 text-red-100 font-medium transition-colors">Mis Pausas Activas</a>
+      <a routerLink="/history" (click)="isMobileMenuOpen = false" class="block py-3 px-4 rounded-xl bg-red-800 text-white font-bold transition shadow-inner">Mis Pausas Activas</a>
+      
       <a routerLink="/statistics" (click)="isMobileMenuOpen = false" class="block py-3 px-4 rounded-xl hover:bg-red-600 text-red-100 font-medium transition-colors">Estadísticas</a>
       
-
       <div *ngIf="role === 'ADMIN'" class="pt-4 mt-4 border-t border-red-600/50">
         <p class="px-4 text-xs font-bold text-red-300 uppercase tracking-wider mb-2">Administración</p>
         <a routerLink="/admin" (click)="isMobileMenuOpen = false" class="block py-3 px-4 rounded-xl hover:bg-red-600 text-red-100 font-medium transition-colors">Panel de Control</a>
