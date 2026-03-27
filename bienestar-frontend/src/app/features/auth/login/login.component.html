@@ -3,59 +3,72 @@
   <span class="font-medium">{{ toastMessage }}</span>
 </div>
 
-<div class="min-h-screen flex">
+<div class="min-h-screen flex bg-gray-50">
   
-  <div class="hidden lg:flex lg:w-1/2 bg-indigo-600 justify-center items-center relative overflow-hidden">
-    <div class="absolute inset-0 bg-gradient-to-br from-indigo-600 to-purple-800 opacity-90"></div>
-    <div class="z-10 text-center text-white p-10">
-      <h1 class="text-5xl font-bold mb-4">Tu Bienestar, <br> Nuestra Prioridad</h1>
-      <p class="text-lg text-indigo-200">Espacio reservado para el diseño personalizado de BWelfare.</p>
-    </div>
-  </div>
-
-  <div class="w-full lg:w-1/2 flex items-center justify-center p-8 bg-gray-50">
-    <div class="w-full max-w-md bg-white rounded-2xl shadow-xl p-8">
+  <div class="w-full lg:w-1/2 flex items-center justify-center p-8 bg-white relative z-10 shadow-2xl">
+    <div class="w-full max-w-md">
       
-      <div class="text-center mb-8">
-        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-indigo-100 text-indigo-600 mb-4">
-          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-          </svg>
-        </div>
-        <h2 class="text-3xl font-extrabold text-gray-900">Welcome to BWelfare</h2>
-        <p class="text-gray-500 mt-2">Inicia sesión para continuar</p>
+      <div class="text-center mb-10">
+        <h2 class="text-4xl font-black text-slate-900 tracking-tight"><span class="text-red-700">Bwelfare</span></h2>
+        <p class="text-gray-500 mt-3 font-medium text-lg">Inicia sesión para continuar</p>
       </div>
 
       <form class="space-y-6" (ngSubmit)="onSubmit()" #loginForm="ngForm">
         
-        <div *ngIf="errorMessage" class="bg-red-50 border border-red-400 text-red-600 px-4 py-3 rounded-lg text-sm">
+        <div *ngIf="errorMessage" class="bg-red-50 border-l-4 border-red-600 text-red-700 px-4 py-3 rounded-r-lg text-sm font-medium flex items-center gap-3 shadow-sm">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
           {{ errorMessage }}
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700">Correo electrónico</label>
-          <input type="email" name="email" required [(ngModel)]="credentials.email" class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+          <label class="block text-sm font-bold text-gray-700 mb-2">Correo institucional</label>
+          <input type="email" name="email" required [(ngModel)]="credentials.email" placeholder="ejemplo@ufpso.edu.co" 
+            class="mt-1 block w-full px-5 py-4 bg-gray-50 border border-gray-200 rounded-xl shadow-sm focus:bg-white focus:ring-2 focus:ring-red-600 focus:border-red-600 transition-all outline-none font-medium text-gray-800">
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700">Contraseña</label>
+          <label class="block text-sm font-bold text-gray-700 mb-2">Contraseña</label>
           <div class="mt-1 relative">
-            <input [type]="showPassword ? 'text' : 'password'" name="password" required [(ngModel)]="credentials.password" class="block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 pr-10">
-            <button type="button" (click)="togglePassword()" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-indigo-600">
-              <svg *ngIf="!showPassword" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
-              <svg *ngIf="showPassword" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" /></svg>
+            <input [type]="showPassword ? 'text' : 'password'" name="password" required [(ngModel)]="credentials.password" placeholder="••••••••"
+              class="block w-full px-5 py-4 bg-gray-50 border border-gray-200 rounded-xl shadow-sm focus:bg-white focus:ring-2 focus:ring-red-600 focus:border-red-600 pr-12 transition-all outline-none font-medium text-gray-800">
+            <button type="button" (click)="togglePassword()" class="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-red-700 transition-colors">
+              <svg *ngIf="!showPassword" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+              <svg *ngIf="showPassword" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" /></svg>
             </button>
           </div>
         </div>
 
-        <button type="submit" [disabled]="!loginForm.form.valid" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 transition-colors">
-          Entrar
+        <button type="submit" [disabled]="!loginForm.form.valid" class="w-full flex justify-center py-4 px-4 mt-8 rounded-xl shadow-lg text-base font-bold text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:-translate-y-0.5">
+          Ingresar a la plataforma
         </button>
       </form>
 
-      <p class="mt-8 text-center text-sm text-gray-600">
-        ¿No tienes una cuenta? <a routerLink="/register" class="font-medium text-indigo-600 hover:text-indigo-500">Regístrate</a>
+      <p class="mt-10 text-center text-sm text-gray-600 font-medium">
+        ¿Eres nuevo en la universidad? <a routerLink="/register" class="font-bold text-red-700 hover:text-red-800 transition-colors border-b-2 border-transparent hover:border-red-700 pb-0.5">Regístrate aquí</a>
       </p>
     </div>
   </div>
+
+  <div class="hidden lg:flex lg:w-1/2 bg-red-800 justify-center items-center relative overflow-hidden">
+    
+    <div class="absolute inset-0 bg-gradient-to-br from-red-700 via-red-800 to-slate-900 opacity-90"></div>
+    
+    <div class="absolute -top-32 -right-32 w-96 h-96 bg-black rounded-full mix-blend-multiply filter blur-3xl opacity-20"></div>
+    <div class="absolute -bottom-32 -left-32 w-96 h-96 bg-red-900 rounded-full mix-blend-multiply filter blur-3xl opacity-40"></div>
+
+    <div class="z-10 text-center p-12 flex flex-col items-center">
+      
+      <img src="../../../../assets/ufpso-logo.png" alt="Logo Universidad Francisco de Paula Santander Ocaña" class="max-w-sm w-full drop-shadow-2xl mb-12 transform hover:scale-105 transition-transform duration-700">
+      
+      <h1 class="text-4xl lg:text-5xl font-black text-white mb-6 leading-tight drop-shadow-lg">
+        Tu Bienestar Universitario<br><span class="text-red-300">Nuestra Prioridad</span>
+      </h1>
+      
+      <p class="text-lg text-red-100 font-medium max-w-md leading-relaxed">
+        Sistema Integral de Pausas Activas para el Personal Administrativo la UFPSO.
+      </p>
+      
+    </div>
+  </div>
+
 </div>

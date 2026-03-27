@@ -20,6 +20,7 @@ export class RegisterComponent {
   showConfirmPassword = false;
   showToast = false;
   toastMessage = '';
+  isLoading = false;
 
   constructor(private authService: AuthService, private router: Router) {}
 
@@ -32,18 +33,30 @@ export class RegisterComponent {
   }
 
   onSubmit() {
+    this.isLoading = true;
+    this.errorMessage = '';
     this.authService.register(this.userData).subscribe({
-      next: (response) => {
+      next: (response: any) => {
+        localStorage.setItem('token', response.token);
+        localStorage.setItem('fullName', response.fullName);
+        localStorage.setItem('role', response.role);
+        localStorage.setItem('userId', response.userId);
+
         this.toastMessage = `¡Registro exitoso! Bienvenido, ${response.fullName}`;
         this.showToast = true;
 
         setTimeout(() => {
           this.showToast = false;
-          this.router.navigate(['/login']);
+          this.router.navigate(['/dashboard']);
         });
       },
       error: (err) => {
-        this.errorMessage = 'Hubo un error. Es posible que el correo ya esté en uso.';
+        this.isLoading = false;
+        if (err.error && typeof err.error === 'string') {
+          this.errorMessage = err.error; // Si el backend manda "El correo ya existe"
+        } else {
+          this.errorMessage = 'Hubo un error al crear la cuenta. Intenta de nuevo.';
+        }
       }
     });
   }
