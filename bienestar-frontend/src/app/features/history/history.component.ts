@@ -18,6 +18,8 @@ export class HistoryComponent implements OnInit {
   userName: string | null = '';
   role: string | null = '';
 
+  isMobileMenuOpen: boolean = false;
+
   constructor(
     private breakService: BreakService,
     private router: Router, // Para el logout
@@ -38,6 +40,10 @@ export class HistoryComponent implements OnInit {
       this.isLoading = false;
       this.cdr.detectChanges(); // Forzamos actualización visual
     }
+  }
+
+  toggleMobileMenu() {
+    this.isMobileMenuOpen = !this.isMobileMenuOpen;
   }
 
   loadHistory() {

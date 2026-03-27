@@ -1,0 +1,140 @@
+<div *ngIf="showToast" class="fixed top-5 right-5 z-50 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-3 transition-opacity" [ngClass]="isError ? 'bg-red-600' : 'bg-green-500'">
+  <span class="font-bold">{{ toastMessage }}</span>
+</div>
+
+<div class="h-screen w-full bg-gray-50 flex flex-col md:flex-row overflow-hidden relative">
+  
+  <div class="md:hidden bg-red-700 text-white p-4 flex justify-between items-center shadow-md z-30 shrink-0">
+    <div class="font-black text-xl flex items-center gap-2">
+      <span>BWelfare</span>
+    </div>
+    <button (click)="toggleMobileMenu()" class="p-2 hover:bg-red-800 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-red-300">
+      <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path *ngIf="!isMobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+        <path *ngIf="isMobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+      </svg>
+    </button>
+  </div>
+
+  <div *ngIf="isMobileMenuOpen" (click)="toggleMobileMenu()" class="absolute inset-0 bg-slate-900/60 z-40 md:hidden backdrop-blur-sm transition-opacity"></div>
+
+  <aside 
+    [ngClass]="isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'"
+    class="absolute md:relative z-50 w-64 h-full bg-red-700 text-white flex flex-col shadow-2xl md:shadow-xl transform transition-transform duration-300 ease-in-out md:translate-x-0 shrink-0">
+    
+    <div class="hidden md:flex p-6 font-black text-xl items-center gap-2 border-b border-red-600/50 shrink-0">
+      <span>BWelfare <span class="text-red-200 text-sm">UFPSO</span></span>
+    </div>
+
+    <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
+      <a routerLink="/dashboard" (click)="isMobileMenuOpen = false" class="block py-3 px-4 rounded-xl hover:bg-red-600 text-red-100 font-medium transition-colors">Inicio</a>
+      
+      <a routerLink="/profile" (click)="isMobileMenuOpen = false" class="block py-3 px-4 rounded-xl bg-red-800 text-white font-bold transition shadow-inner flex items-center gap-2">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+        Mi Perfil
+      </a>
+      
+      <a routerLink="/history" (click)="isMobileMenuOpen = false" class="block py-3 px-4 rounded-xl hover:bg-red-600 text-red-100 font-medium transition-colors">Mis Pausas Activas</a>
+      <a routerLink="/statistics" (click)="isMobileMenuOpen = false" class="block py-3 px-4 rounded-xl hover:bg-red-600 text-red-100 font-medium transition-colors">Estadísticas</a>
+      
+      <div *ngIf="role === 'ADMIN'" class="pt-4 mt-4 border-t border-red-600/50">
+        <p class="px-4 text-xs font-bold text-red-300 uppercase tracking-wider mb-2">Administración</p>
+        <a routerLink="/admin" (click)="isMobileMenuOpen = false" class="block py-3 px-4 rounded-xl hover:bg-red-600 text-red-100 font-medium transition-colors">Panel de Control</a>
+      </div>
+    </nav>
+
+    <div class="p-5 border-t border-red-600/50 flex flex-col items-center gap-6 shrink-0 bg-red-700">
+      <button (click)="logout()" class="w-full flex justify-center items-center gap-2 py-3 bg-slate-900 hover:bg-black rounded-xl text-white font-bold transition-colors shadow-md">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+        Cerrar Sesión
+      </button>
+      <img src="https://ufpso.edu.co/media/contenido/identidad/log_horizontal_blanco.png" alt="Logo UFPSO" class="w-48 opacity-90 hover:opacity-100 transition-opacity duration-300 pb-2">
+    </div>
+  </aside>
+
+  <main class="flex-1 h-full overflow-y-auto p-4 md:p-8 bg-gray-50">
+    
+    <header class="flex flex-col md:flex-row md:justify-between md:items-center bg-white p-5 md:p-6 rounded-2xl shadow-sm mb-6 md:mb-8 border border-gray-100 gap-4">
+      <div>
+        <h1 class="text-2xl md:text-3xl font-black text-slate-900">Mi Perfil</h1>
+        <p class="text-gray-500 mt-1 font-medium text-sm md:text-base">Gestiona tu información personal y foto de avatar.</p>
+      </div>
+    </header>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
+      
+      <div class="lg:col-span-1">
+        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden text-center h-fit">
+          <div class="h-32 bg-red-700 w-full relative">
+            <div class="absolute inset-0 bg-gradient-to-r from-red-800 to-red-600 opacity-90"></div>
+          </div>
+          
+          <div class="relative -mt-16 flex justify-center">
+            <div class="w-32 h-32 rounded-full border-4 border-white bg-slate-100 shadow-md overflow-hidden flex items-center justify-center">
+              <img *ngIf="profileData.profilePictureUrl" [src]="profileData.profilePictureUrl" alt="Avatar" class="w-full h-full object-cover">
+              <span *ngIf="!profileData.profilePictureUrl" class="text-5xl font-black text-red-700 uppercase">{{ profileData.fullName ? profileData.fullName.charAt(0) : 'U' }}</span>
+            </div>
+          </div>
+
+          <div class="p-6 pt-4 pb-8">
+            <h2 class="text-2xl font-black text-slate-900">{{ profileData.fullName || 'Usuario UFPSO' }}</h2>
+            <p class="text-red-700 font-bold text-sm uppercase tracking-widest mt-1">{{ role === 'EMPLOYEE' ? 'Empleado' : role }}</p>
+            
+            <p class="text-gray-600 mt-4 text-sm font-medium leading-relaxed italic">
+              "{{ profileData.bio || 'Sin biografía. ¡Anímate a contarle a la comunidad sobre ti en el formulario de al lado!' }}"
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="lg:col-span-2">
+        <div class="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 h-fit">
+          <h3 class="text-xl font-black text-slate-900 mb-6 border-b border-gray-100 pb-4 flex items-center gap-2">
+            <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+            Editar Información
+          </h3>
+          
+          <form (ngSubmit)="saveProfile()" class="space-y-6">
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <label class="block text-sm font-bold text-gray-700 mb-2">Nombre Completo</label>
+                <input type="text" [(ngModel)]="profileData.fullName" name="fullName" required 
+                  class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl shadow-sm focus:bg-white focus:ring-2 focus:ring-red-600 focus:border-red-600 outline-none transition-all font-medium text-gray-800">
+              </div>
+              
+              <div>
+                <label class="block text-sm font-bold text-gray-700 mb-2">Correo Institucional</label>
+                <input type="email" [(ngModel)]="profileData.email" name="email" required 
+                  class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl shadow-sm focus:bg-white focus:ring-2 focus:ring-red-600 focus:border-red-600 outline-none transition-all font-medium text-gray-800">
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-bold text-gray-700 mb-2">URL de la Foto de Perfil (Opcional)</label>
+              <input type="text" [(ngModel)]="profileData.profilePictureUrl" name="profilePic" 
+                placeholder="https://ejemplo.com/mifoto.jpg"
+                class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl shadow-sm focus:bg-white focus:ring-2 focus:ring-red-600 focus:border-red-600 outline-none transition-all font-medium text-gray-800">
+              <p class="text-xs text-gray-500 mt-2">Pega un enlace directo a tu imagen. Si lo dejas vacío, usaremos tus iniciales.</p>
+            </div>
+
+            <div>
+              <label class="block text-sm font-bold text-gray-700 mb-2">Acerca de ti (Biografía)</label>
+              <textarea [(ngModel)]="profileData.bio" name="bio" rows="4" 
+                placeholder="Ej. Entusiasta de las bases de datos en Ocaña. Conocido como TheOddProgrammer..."
+                class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl shadow-sm focus:bg-white focus:ring-2 focus:ring-red-600 focus:border-red-600 outline-none transition-all font-medium text-gray-800 leading-relaxed"></textarea>
+            </div>
+
+            <div class="pt-4 border-t border-gray-100 flex justify-end">
+              <button type="submit" class="w-full md:w-auto px-8 py-3.5 bg-red-700 hover:bg-red-800 text-white rounded-xl font-bold transition-colors shadow-md text-sm md:text-base">
+                Guardar Cambios
+              </button>
+            </div>
+
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>

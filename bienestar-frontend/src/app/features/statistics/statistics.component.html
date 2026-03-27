@@ -1,106 +1,128 @@
-<div class="min-h-screen bg-gray-100 flex">
+<div class="h-screen w-full bg-gray-50 flex flex-col md:flex-row overflow-hidden relative">
   
-  <aside class="w-64 bg-indigo-700 text-white flex flex-col shadow-xl">
-    <a routerLink="/dashboard" class="p-6 font-bold text-2xl flex items-center gap-3 border-b border-indigo-600 hover:bg-indigo-600/50 transition">
-      <svg class="w-8 h-8 text-indigo-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+  <div class="md:hidden bg-red-700 text-white p-4 flex justify-between items-center shadow-md z-30 shrink-0">
+    <div class="font-black text-xl flex items-center gap-2">
       <span>BWelfare</span>
-    </a>
+    </div>
+    <button (click)="toggleMobileMenu()" class="p-2 hover:bg-red-800 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-red-300">
+      <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path *ngIf="!isMobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+        <path *ngIf="isMobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+      </svg>
+    </button>
+  </div>
 
-    <nav class="flex-1 p-4 space-y-2">
-      <a routerLink="/dashboard" class="block py-3 px-4 rounded-lg hover:bg-indigo-600 text-indigo-100 transition">Inicio</a>
-      <a routerLink="/history" class="block py-3 px-4 rounded-lg hover:bg-indigo-600 text-indigo-100 transition">Mis Pausas Activas</a>
+  <div *ngIf="isMobileMenuOpen" (click)="toggleMobileMenu()" class="absolute inset-0 bg-slate-900/60 z-40 md:hidden backdrop-blur-sm transition-opacity"></div>
+
+  <aside 
+    [ngClass]="isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'"
+    class="absolute md:relative z-50 w-64 h-full bg-red-700 text-white flex flex-col shadow-2xl md:shadow-xl transform transition-transform duration-300 ease-in-out md:translate-x-0 shrink-0">
+    
+    <div class="hidden md:flex p-6 font-black text-xl items-center gap-2 border-b border-red-600/50 shrink-0">
+      <span>BWelfare <span class="text-red-200 text-sm">UFPSO</span></span>
+    </div>
+
+    <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
+      <a routerLink="/dashboard" (click)="isMobileMenuOpen = false" class="block py-3 px-4 rounded-xl bg-red-800 text-white font-bold transition shadow-inner">Inicio</a>
+      <a routerLink="/profile" (click)="isMobileMenuOpen = false" class="block py-3 px-4 rounded-xl hover:bg-red-600 text-red-100 font-medium transition-colors">Mi Perfil</a>
+      <a routerLink="/history" (click)="isMobileMenuOpen = false" class="block py-3 px-4 rounded-xl hover:bg-red-600 text-red-100 font-medium transition-colors">Mis Pausas Activas</a>
+      <a routerLink="/statistics" (click)="isMobileMenuOpen = false" class="block py-3 px-4 rounded-xl hover:bg-red-600 text-red-100 font-medium transition-colors">Estadísticas</a>
       
-      <a routerLink="/statistics" class="block py-3 px-4 rounded-lg bg-indigo-800 text-white font-medium transition shadow-inner">Estadísticas</a>
-      <div *ngIf="role === 'ADMIN'" class="pt-4 mt-4 border-t border-indigo-600">
-        <p class="px-4 text-xs font-bold text-indigo-300 uppercase tracking-wider mb-2">Administración</p>
-        <a routerLink="/admin" class="block py-3 px-4 rounded-lg hover:bg-indigo-600 text-indigo-100 transition">Panel de Control</a>
+
+      <div *ngIf="role === 'ADMIN'" class="pt-4 mt-4 border-t border-red-600/50">
+        <p class="px-4 text-xs font-bold text-red-300 uppercase tracking-wider mb-2">Administración</p>
+        <a routerLink="/admin" (click)="isMobileMenuOpen = false" class="block py-3 px-4 rounded-xl hover:bg-red-600 text-red-100 font-medium transition-colors">Panel de Control</a>
       </div>
     </nav>
 
-    <div class="p-4 border-t border-indigo-600">
-      <button (click)="logout()" class="w-full flex justify-center items-center gap-2 py-3 bg-red-500 hover:bg-red-600 rounded-lg text-white font-medium transition-colors shadow-md">
+    <div class="p-5 border-t border-red-600/50 flex flex-col items-center gap-6 shrink-0 bg-red-700">
+      <button (click)="logout()" class="w-full flex justify-center items-center gap-2 py-3 bg-slate-900 hover:bg-black rounded-xl text-white font-bold transition-colors shadow-md">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
         Cerrar Sesión
       </button>
+      
+      <img src="https://ufpso.edu.co/media/contenido/identidad/log_horizontal_blanco.png" alt="Logo UFPSO" class="w-48 opacity-90 hover:opacity-100 transition-opacity duration-300 pb-2">
     </div>
   </aside>
 
-  <main class="flex-1 p-8 overflow-y-auto">
+  <main class="flex-1 h-full overflow-y-auto p-4 md:p-8 bg-gray-50">
     
-    <header class="flex justify-between items-center bg-white p-6 rounded-2xl shadow-sm mb-8 border border-gray-100">
+    <header class="flex flex-col md:flex-row md:justify-between md:items-center bg-white p-5 md:p-6 rounded-2xl shadow-sm mb-6 md:mb-8 border border-gray-100 gap-4">
       <div>
-        <h1 class="text-3xl font-black text-slate-800">Mi Rendimiento</h1>
-        <p class="text-gray-500 mt-2">Analiza tu progreso y descubre qué hábitos dominas.</p>
+        <h1 class="text-2xl md:text-3xl font-black text-slate-900">Mi Rendimiento</h1>
+        <p class="text-gray-500 mt-1 font-medium text-sm md:text-base">Analiza tu progreso y descubre qué hábitos dominas.</p>
       </div>
       
-      <div class="flex items-center gap-4">
-        <div class="text-right hidden md:block">
+      <div class="flex items-center gap-4 bg-gray-50 md:bg-transparent p-3 md:p-0 rounded-xl md:rounded-none border md:border-transparent border-gray-100">
+        <div class="text-right">
           <p class="text-sm font-bold text-gray-900">{{ userName }}</p>
-          <p class="text-xs font-medium text-indigo-600 bg-indigo-50 inline-block px-2 py-1 rounded-full mt-1">
+          <p class="text-xs font-bold text-red-700 bg-red-50 inline-block px-2 py-1 rounded-full mt-1 border border-red-100">
             {{ role === 'EMPLOYEE' ? 'Empleado' : role }}
           </p>
         </div>
-        <div class="h-12 w-12 rounded-full bg-indigo-100 border-2 border-indigo-200 flex justify-center items-center text-indigo-700 font-bold text-xl uppercase shadow-sm">
+        <div class="h-10 w-10 md:h-12 md:w-12 rounded-full bg-red-100 border-2 border-red-200 flex justify-center items-center text-red-700 font-bold text-lg md:text-xl uppercase shadow-sm shrink-0">
           {{ userName ? userName.charAt(0) : 'U' }}
         </div>
       </div>
     </header>
 
     <div *ngIf="isLoading" class="flex justify-center py-20">
-      <div class="animate-spin rounded-full h-16 w-16 border-b-4 border-indigo-600"></div>
+      <div class="animate-spin rounded-full h-16 w-16 border-b-4 border-red-700"></div>
     </div>
 
     <div *ngIf="!isLoading">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-5 hover:shadow-md transition">
-          <div class="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center text-blue-500">
-            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+      
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 mb-8">
+        
+        <div class="bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 md:gap-5 hover:shadow-md transition">
+          <div class="w-14 h-14 md:w-16 md:h-16 rounded-full bg-red-50 flex items-center justify-center text-red-600 shrink-0 border border-red-100">
+            <svg class="w-7 h-7 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
           </div>
           <div>
-            <p class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-1">Total Pausas</p>
-            <p class="text-3xl font-black text-slate-800">{{ totalBreaks }}</p>
+            <p class="text-xs md:text-sm font-bold text-gray-400 uppercase tracking-wider mb-1">Total Pausas</p>
+            <p class="text-2xl md:text-3xl font-black text-slate-800">{{ totalBreaks }}</p>
           </div>
         </div>
 
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-5 hover:shadow-md transition">
-          <div class="w-16 h-16 rounded-full bg-green-50 flex items-center justify-center text-green-500">
-            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        <div class="bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 md:gap-5 hover:shadow-md transition">
+          <div class="w-14 h-14 md:w-16 md:h-16 rounded-full bg-slate-50 flex items-center justify-center text-slate-600 shrink-0 border border-slate-200">
+            <svg class="w-7 h-7 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
           </div>
           <div>
-            <p class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-1">Tiempo Invertido</p>
-            <p class="text-3xl font-black text-slate-800">{{ totalMinutes }} <span class="text-base font-medium text-gray-500">min</span></p>
+            <p class="text-xs md:text-sm font-bold text-gray-400 uppercase tracking-wider mb-1">Tiempo Invertido</p>
+            <p class="text-2xl md:text-3xl font-black text-slate-800">{{ totalMinutes }} <span class="text-sm md:text-base font-medium text-gray-500">min</span></p>
           </div>
         </div>
 
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-5 hover:shadow-md transition">
-          <div class="w-16 h-16 rounded-full bg-purple-50 flex items-center justify-center text-purple-500">
-            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
+        <div class="bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 md:gap-5 hover:shadow-md transition sm:col-span-2 md:col-span-1">
+          <div class="w-14 h-14 md:w-16 md:h-16 rounded-full bg-red-50 flex items-center justify-center text-red-600 shrink-0 border border-red-100">
+            <svg class="w-7 h-7 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
           </div>
           <div>
-            <p class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-1">Cat. Favorita</p>
-            <p class="text-2xl font-black text-slate-800 uppercase">{{ favoriteCategory }}</p>
+            <p class="text-xs md:text-sm font-bold text-gray-400 uppercase tracking-wider mb-1">Cat. Favorita</p>
+            <p class="text-xl md:text-2xl font-black text-slate-800 uppercase truncate max-w-[150px]">{{ favoriteCategory }}</p>
           </div>
         </div>
       </div>
 
-      <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
-        <h2 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-          <svg class="w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+      <div class="bg-white p-6 md:p-8 rounded-2xl md:rounded-3xl shadow-sm border border-gray-100">
+        <h2 class="text-lg md:text-xl font-black text-slate-900 mb-6 flex items-center gap-2">
+          <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
           Distribución por Categorías
         </h2>
         
-        <div *ngIf="categoryStats.length === 0" class="text-center py-8 text-gray-500 font-medium">
+        <div *ngIf="categoryStats.length === 0" class="text-center py-8 text-gray-500 font-medium text-sm md:text-base">
           Aún no hay datos suficientes para graficar.
         </div>
 
         <div class="space-y-6">
           <div *ngFor="let cat of categoryStats" class="relative">
             <div class="flex justify-between items-end mb-2">
-              <span class="text-sm font-bold text-gray-700 uppercase tracking-wide">{{ cat.name }}</span>
-              <span class="text-sm font-bold text-indigo-600">{{ cat.percentage }}% <span class="text-xs text-gray-400 font-medium ml-1">({{ cat.count }} pausas)</span></span>
+              <span class="text-xs md:text-sm font-bold text-slate-700 uppercase tracking-wide">{{ cat.name }}</span>
+              <span class="text-xs md:text-sm font-black text-red-700">{{ cat.percentage }}% <span class="text-[10px] md:text-xs text-gray-400 font-bold ml-1">({{ cat.count }} pausas)</span></span>
             </div>
-            <div class="w-full bg-gray-100 rounded-full h-4 overflow-hidden">
-              <div class="bg-indigo-500 h-4 rounded-full transition-all duration-1000 ease-out" [style.width.%]="cat.percentage"></div>
+            <div class="w-full bg-gray-100 rounded-full h-3 md:h-4 overflow-hidden">
+              <div class="bg-red-600 h-3 md:h-4 rounded-full transition-all duration-1000 ease-out shadow-sm" [style.width.%]="cat.percentage"></div>
             </div>
           </div>
         </div>

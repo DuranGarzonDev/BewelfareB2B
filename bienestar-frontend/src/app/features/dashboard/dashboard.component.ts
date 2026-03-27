@@ -26,6 +26,7 @@ export class DashboardComponent implements OnInit {
   role: string | null = '';
   showToast = false;
   toastMessage = '';
+  
 
   activeBreaks: any[] = []; 
   completedBreaksCount: number = 0;
@@ -39,6 +40,8 @@ export class DashboardComponent implements OnInit {
   currentBreak: any = null;
   timeLeft: number = 0;
   timerInterval: any;
+
+  isMobileMenuOpen: boolean = false;
 
   constructor(
     private router: Router, 
@@ -67,6 +70,10 @@ export class DashboardComponent implements OnInit {
       this.loadBreaks();
       this.loadStats();
     }
+  }
+
+  toggleMobileMenu() {
+    this.isMobileMenuOpen = !this.isMobileMenuOpen;
   }
 
   loadBreaks() {

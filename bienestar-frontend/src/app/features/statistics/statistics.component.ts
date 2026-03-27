@@ -22,6 +22,8 @@ export class StatisticsComponent implements OnInit {
   
   // Datos para nuestro gráfico de barras
   categoryStats: { name: string, count: number, percentage: number }[] = [];
+  isMobileMenuOpen: boolean = false;
+
 
   constructor(
     private breakService: BreakService,
@@ -39,6 +41,10 @@ export class StatisticsComponent implements OnInit {
     } else if (this.myUserId) {
       this.loadAndCalculateStats();
     }
+  }
+
+  toggleMobileMenu() {
+    this.isMobileMenuOpen = !this.isMobileMenuOpen;
   }
 
   loadAndCalculateStats() {

@@ -5,6 +5,7 @@ import { DashboardComponent } from './features/dashboard/dashboard.component'; /
 import { HistoryComponent } from './features/history/history.component'; // <-- Importar
 import { StatisticsComponent } from './features/statistics/statistics.component';
 import { AdminPanelComponent } from './features/admin-panel/admin-panel.component'; // <-- Importar
+import { ProfileComponent } from './features/profile/profile.component'; // <-- Importar
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -12,6 +13,7 @@ export const routes: Routes = [
   { path: 'dashboard', component: DashboardComponent }, // <-- ¡Nueva ruta activa!
   { path: 'history', component: HistoryComponent }, // <-- ¡Nueva ruta activa!
   { path: 'statistics', component: StatisticsComponent },
-  { path: 'admin', component: AdminPanelComponent }, // <-- ¡Nueva ruta activa!
+  { path: 'admin', component: AdminPanelComponent },
+  { path: 'profile', component: ProfileComponent }, // <-- ¡Nueva ruta activa!
   { path: '', redirectTo: '/login', pathMatch: 'full' }
 ];

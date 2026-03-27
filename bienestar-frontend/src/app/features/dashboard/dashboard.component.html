@@ -3,102 +3,127 @@
   <span class="font-medium">{{ toastMessage }}</span>
 </div>
 
-<div class="min-h-screen bg-gray-100 flex">
+<div class="h-screen w-full bg-gray-50 flex flex-col md:flex-row overflow-hidden relative">
   
-  <aside class="w-64 bg-indigo-700 text-white flex flex-col shadow-xl">
-    <div class="p-6 font-bold text-2xl flex items-center gap-3 border-b border-indigo-600">
-      <svg class="w-8 h-8 text-indigo-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+  <div class="md:hidden bg-red-700 text-white p-4 flex justify-between items-center shadow-md z-30 shrink-0">
+    <div class="font-black text-xl flex items-center gap-2">
+      <svg class="w-6 h-6 text-red-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
       <span>BWelfare</span>
     </div>
+    <button (click)="toggleMobileMenu()" class="p-2 hover:bg-red-800 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-red-300">
+      <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path *ngIf="!isMobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+        <path *ngIf="isMobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+      </svg>
+    </button>
+  </div>
 
-    <nav class="flex-1 p-4 space-y-2">
-      <a routerLink="/dashboard" class="block py-3 px-4 rounded-lg bg-indigo-800 text-white font-medium transition shadow-inner">Inicio</a>
-      <a routerLink="/history" class="block py-3 px-4 rounded-lg hover:bg-indigo-600 text-indigo-100 transition">Mis Pausas Activas</a>
-      <a routerLink="/statistics" class="block py-3 px-4 rounded-lg hover:bg-indigo-600 text-indigo-100 transition">Estadísticas</a>
-      <div *ngIf="role === 'ADMIN'" class="pt-4 mt-4 border-t border-indigo-600">
-        <p class="px-4 text-xs font-bold text-indigo-300 uppercase tracking-wider mb-2">Administración</p>
-        <a routerLink="/admin" class="block py-3 px-4 rounded-lg hover:bg-indigo-600 text-indigo-100 transition">Panel de Control</a>
+  <div *ngIf="isMobileMenuOpen" (click)="toggleMobileMenu()" class="absolute inset-0 bg-slate-900/60 z-40 md:hidden backdrop-blur-sm transition-opacity"></div>
+
+  <aside 
+    [ngClass]="isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'"
+    class="absolute md:relative z-50 w-64 h-full bg-red-700 text-white flex flex-col shadow-2xl md:shadow-xl transform transition-transform duration-300 ease-in-out md:translate-x-0 shrink-0">
+    
+    <div class="hidden md:flex p-6 font-black text-xl items-center gap-2 border-b border-red-600/50 shrink-0">
+      <!-- <svg class="w-8 h-8 text-red-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> -->
+      <span>BWelfare <span class="text-red-200 text-sm">UFPSO</span></span>
+    </div>
+
+    <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
+      <a routerLink="/dashboard" (click)="isMobileMenuOpen = false" class="block py-3 px-4 rounded-xl bg-red-800 text-white font-bold transition shadow-inner">Inicio</a>
+      <a routerLink="/profile" (click)="isMobileMenuOpen = false" class="block py-3 px-4 rounded-xl hover:bg-red-600 text-red-100 font-medium transition-colors">Mi Perfil</a>
+      <a routerLink="/history" (click)="isMobileMenuOpen = false" class="block py-3 px-4 rounded-xl hover:bg-red-600 text-red-100 font-medium transition-colors">Mis Pausas Activas</a>
+      <a routerLink="/statistics" (click)="isMobileMenuOpen = false" class="block py-3 px-4 rounded-xl hover:bg-red-600 text-red-100 font-medium transition-colors">Estadísticas</a>
+      
+
+      <div *ngIf="role === 'ADMIN'" class="pt-4 mt-4 border-t border-red-600/50">
+        <p class="px-4 text-xs font-bold text-red-300 uppercase tracking-wider mb-2">Administración</p>
+        <a routerLink="/admin" (click)="isMobileMenuOpen = false" class="block py-3 px-4 rounded-xl hover:bg-red-600 text-red-100 font-medium transition-colors">Panel de Control</a>
       </div>
     </nav>
 
-    <div class="p-4 border-t border-indigo-600">
-      <button (click)="logout()" class="w-full flex justify-center items-center gap-2 py-3 bg-red-500 hover:bg-red-600 rounded-lg text-white font-medium transition-colors shadow-md">
+    <div class="p-5 border-t border-red-600/50 flex flex-col items-center gap-6 shrink-0 bg-red-700">
+      <button (click)="logout()" class="w-full flex justify-center items-center gap-2 py-3 bg-slate-900 hover:bg-black rounded-xl text-white font-bold transition-colors shadow-md">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
         Cerrar Sesión
       </button>
+      <img src="https://ufpso.edu.co/media/contenido/identidad/log_horizontal_blanco.png" alt="Logo UFPSO" class="w-48 opacity-90 hover:opacity-100 transition-opacity duration-300 pb-2">
     </div>
   </aside>
 
-  <main class="flex-1 p-8 overflow-y-auto">
+  <main class="flex-1 h-full overflow-y-auto p-4 md:p-8 bg-gray-50">
     
-    <header class="flex justify-between items-center bg-white p-6 rounded-2xl shadow-sm mb-8 border border-gray-100">
+    <header class="flex flex-col md:flex-row md:justify-between md:items-center bg-white p-5 md:p-6 rounded-2xl shadow-sm mb-6 md:mb-8 border border-gray-100 gap-4">
       <div>
-        <h1 class="text-3xl font-extrabold text-gray-800">Panel de Control</h1>
-        <p class="text-gray-500 mt-1">¡Qué bueno verte de nuevo por aquí!</p>
+        <h1 class="text-2xl md:text-3xl font-black text-slate-900">Panel de Control</h1>
+        <p class="text-gray-500 mt-1 font-medium text-sm md:text-base">¡Qué bueno verte de nuevo por aquí!</p>
       </div>
       
-      <div class="flex items-center gap-4">
-        <div class="text-right hidden md:block">
+      <div class="flex items-center gap-4 bg-gray-50 md:bg-transparent p-3 md:p-0 rounded-xl md:rounded-none border md:border-transparent border-gray-100">
+        <div class="text-right">
           <p class="text-sm font-bold text-gray-900">{{ userName }}</p>
-          <p class="text-xs font-medium text-indigo-600 bg-indigo-50 inline-block px-2 py-1 rounded-full mt-1">
+          <p class="text-xs font-bold text-red-700 bg-red-50 inline-block px-2 py-1 rounded-full mt-1 border border-red-100">
             {{ role === 'EMPLOYEE' ? 'Empleado' : role }}
           </p>
         </div>
-        <div class="h-12 w-12 rounded-full bg-indigo-100 border-2 border-indigo-200 flex justify-center items-center text-indigo-700 font-bold text-xl uppercase shadow-sm">
+        <div class="h-10 w-10 md:h-12 md:w-12 rounded-full bg-red-100 border-2 border-red-200 flex justify-center items-center text-red-700 font-bold text-lg md:text-xl uppercase shadow-sm shrink-0">
           {{ userName ? userName.charAt(0) : 'U' }}
         </div>
       </div>
     </header>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex-1">
-        <h3 class="text-sm font-bold text-gray-500 mb-1 uppercase tracking-wider">Pausas Completadas</h3>
-        <p class="text-4xl font-black text-slate-800">{{ completedBreaksCount }}</p>
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+      <div class="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-gray-100 flex-1 hover:shadow-md transition-shadow">
+        <h3 class="text-xs md:text-sm font-bold text-gray-400 mb-1 uppercase tracking-wider">Pausas <span class="hidden sm:inline">Completadas</span></h3>
+        <p class="text-3xl md:text-4xl font-black text-slate-800">{{ completedBreaksCount }}</p>
       </div>
-      <div class="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-green-500 hover:shadow-md transition">
-        <h3 class="text-gray-500 text-sm font-medium uppercase tracking-wider">Racha Actual</h3>
-        <p class="text-4xl font-black text-slate-800">{{ currentStreak }} <span class="text-sm font-medium text-gray-500 ml-1">Días</span></p>
+      <div class="bg-white p-4 md:p-6 rounded-2xl shadow-sm border-l-4 border-green-500 hover:shadow-md transition-shadow">
+        <h3 class="text-gray-400 text-xs md:text-sm font-bold uppercase tracking-wider">Racha <span class="hidden sm:inline">Actual</span></h3>
+        <p class="text-3xl md:text-4xl font-black text-slate-800">{{ currentStreak }} <span class="text-xs md:text-sm font-medium text-gray-500 ml-1">Días</span></p>
       </div>
     </div>
     
-    <div class="mt-12">
+    <div class="mt-8 md:mt-12">
       <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-bold text-gray-800">Pausas Recomendadas</h2>
-        <button class="text-indigo-600 hover:text-indigo-800 font-medium text-sm transition">Ver todas &rarr;</button>
+        <h2 class="text-xl md:text-2xl font-black text-slate-900">Pausas Recomendadas</h2>
+        <button class="text-red-700 hover:text-red-800 font-bold text-sm transition-colors flex items-center gap-1">
+          Ver todas <svg class="w-4 h-4 hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+        </button>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+      <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 md:gap-6">
         
-        <div *ngFor="let breakItem of activeBreaks" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col">
-          
-          <div class="h-40 bg-indigo-50 flex justify-center items-center overflow-hidden">
-            <img [src]="breakItem.mediaUrl || 'https://cdn-icons-png.flaticon.com/512/3305/3305803.png'" alt="Imagen de pausa" class="h-24 object-contain drop-shadow-sm transition-transform hover:scale-110 duration-300">
+        <div *ngFor="let breakItem of activeBreaks" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300 flex flex-col transform hover:-translate-y-1">
+          <div class="h-32 md:h-40 bg-red-50 flex justify-center items-center overflow-hidden border-b border-red-100/50">
+            <img [src]="breakItem.mediaUrl || 'https://cdn-icons-png.flaticon.com/512/3305/3305803.png'" alt="Imagen de pausa" class="h-20 md:h-24 object-contain drop-shadow-sm transition-transform hover:scale-110 duration-500">
           </div>
           
-          <div class="p-6 flex-1 flex flex-col">
-            <div class="flex justify-between items-start mb-2">
-              <span class="bg-indigo-100 text-indigo-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
+          <div class="p-5 md:p-6 flex-1 flex flex-col">
+            <div class="flex justify-between items-start mb-3">
+              <span class="bg-red-100 text-red-700 text-[10px] md:text-xs font-bold px-2 md:px-3 py-1 rounded-full uppercase tracking-wide border border-red-200 truncate max-w-[60%]">
                 {{ breakItem.category?.name || 'General' }}
               </span>
-              <span class="flex items-center text-gray-500 text-sm font-medium">
-                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              <span class="flex items-center text-gray-500 text-xs md:text-sm font-bold shrink-0">
+                <svg class="w-3.5 h-3.5 md:w-4 md:h-4 mr-1 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                 {{ breakItem.durationSeconds }}s
               </span>
             </div>
             
-            <h3 class="text-xl font-bold text-gray-900 mb-2">{{ breakItem.title }}</h3>
-            <p class="text-gray-600 text-sm flex-1 line-clamp-3">{{ breakItem.description }}</p>
+            <h3 class="text-lg md:text-xl font-black text-slate-900 mb-2 leading-tight">{{ breakItem.title }}</h3>
+            <p class="text-gray-600 text-xs md:text-sm flex-1 line-clamp-2 md:line-clamp-3 font-medium">{{ breakItem.description }}</p>
             
-            <button (click)="openModal(breakItem)" class="mt-6 w-full py-2.5 bg-indigo-50 hover:bg-indigo-600 text-indigo-700 hover:text-white rounded-xl font-semibold transition-colors duration-300">
+            <button (click)="openModal(breakItem)" class="mt-4 md:mt-6 w-full py-2.5 md:py-3 bg-red-50 hover:bg-red-700 text-red-700 hover:text-white rounded-xl font-bold transition-colors duration-300 border border-red-100 hover:border-red-700 text-sm md:text-base">
               Iniciar Pausa
             </button>
           </div>
         </div>
 
-        <div *ngIf="activeBreaks.length === 0" class="col-span-full bg-gray-50 rounded-2xl p-8 text-center border-2 border-dashed border-gray-200">
-          <svg class="mx-auto h-12 w-12 text-gray-400 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-          <h3 class="text-lg font-medium text-gray-900">No hay pausas disponibles</h3>
-          <p class="text-gray-500 mt-1">Aún no se han creado pausas activas en la base de datos.</p>
+        <div *ngIf="activeBreaks.length === 0" class="col-span-full bg-white rounded-2xl p-6 md:p-10 text-center border-2 border-dashed border-gray-200">
+          <div class="w-12 h-12 md:w-16 md:h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
+            <svg class="h-6 w-6 md:h-8 md:w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2-2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+          </div>
+          <h3 class="text-lg md:text-xl font-black text-slate-900">No hay pausas disponibles</h3>
+          <p class="text-gray-500 mt-1 md:mt-2 font-medium text-sm md:text-base">Aún no se han creado pausas activas en la base de datos.</p>
         </div>
 
       </div>
@@ -107,28 +132,30 @@
   </main>
 </div>
 
-<div *ngIf="isModalOpen" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900 bg-opacity-60 backdrop-blur-sm transition-opacity">
-  <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md p-10 relative flex flex-col items-center text-center transform transition-all">
+<div *ngIf="isModalOpen" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/70 backdrop-blur-sm transition-opacity p-4">
+  <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-md p-6 md:p-10 relative flex flex-col items-center text-center transform transition-all border border-gray-100">
     
-    <button (click)="closeModal()" class="absolute top-5 right-5 text-gray-400 hover:text-red-500 transition-colors bg-gray-50 hover:bg-red-50 rounded-full p-2">
+    <button (click)="closeModal()" class="absolute top-4 right-4 md:top-5 md:right-5 text-gray-400 hover:text-red-600 transition-colors bg-gray-50 hover:bg-red-50 rounded-full p-2">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
     </button>
 
-    <div class="h-28 w-28 bg-indigo-50 rounded-full flex items-center justify-center mb-6 border-4 border-indigo-100">
-      <img [src]="currentBreak?.mediaUrl || 'https://cdn-icons-png.flaticon.com/512/3305/3305803.png'" alt="Pausa" class="h-16 object-contain">
+    <div class="h-24 w-24 md:h-28 md:w-28 bg-red-50 rounded-full flex items-center justify-center mb-5 md:mb-6 border-4 border-red-100 shadow-inner">
+      <img [src]="currentBreak?.mediaUrl || 'https://cdn-icons-png.flaticon.com/512/3305/3305803.png'" alt="Pausa" class="h-12 md:h-16 object-contain">
     </div>
     
-    <h2 class="text-2xl font-black text-gray-800 mb-3">{{ currentBreak?.title }}</h2>
-    <p class="text-gray-600 mb-8 leading-relaxed text-sm">{{ currentBreak?.description }}</p>
+    <h2 class="text-xl md:text-2xl font-black text-slate-900 mb-2 md:mb-3">{{ currentBreak?.title }}</h2>
+    <p class="text-gray-500 mb-6 md:mb-8 leading-relaxed text-xs md:text-sm font-medium px-2">{{ currentBreak?.description }}</p>
 
-    <div class="bg-indigo-600 text-white rounded-2xl w-full py-6 mb-6 shadow-inner shadow-indigo-800">
-      <p class="text-sm text-indigo-200 font-medium tracking-widest uppercase mb-1">Tiempo Restante</p>
-      <div class="text-6xl font-black font-mono tracking-tight">
+    <div class="bg-red-700 text-white rounded-2xl w-full py-5 md:py-6 mb-5 md:mb-6 shadow-lg shadow-red-900/20 relative overflow-hidden">
+      <div class="absolute -right-6 -top-6 w-24 h-24 bg-red-600 rounded-full opacity-50 blur-xl"></div>
+      
+      <p class="text-xs md:text-sm text-red-200 font-bold tracking-widest uppercase mb-1 relative z-10">Tiempo Restante</p>
+      <div class="text-5xl md:text-6xl font-black font-mono tracking-tight relative z-10">
         00:{{ timeLeft < 10 ? '0' + timeLeft : timeLeft }}
       </div>
     </div>
 
-    <button (click)="closeModal()" class="text-sm font-bold text-gray-400 hover:text-gray-700 transition-colors uppercase tracking-wider">
+    <button (click)="closeModal()" class="text-xs md:text-sm font-bold text-gray-400 hover:text-slate-800 transition-colors uppercase tracking-wider py-2">
       Cancelar
     </button>
   </div>

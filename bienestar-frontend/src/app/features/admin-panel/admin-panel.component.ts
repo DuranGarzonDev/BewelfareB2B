@@ -23,6 +23,7 @@ export class AdminPanelComponent implements OnInit {
   // Modelos para los formularios
   newCategory = { name: '', description: '' };
   newBreak = { title: '', description: '', durationSeconds: 60, mediaUrl: '', categoryId: null };
+  isMobileMenuOpen: boolean = false;
 
   constructor(
     private router: Router,
@@ -41,6 +42,10 @@ export class AdminPanelComponent implements OnInit {
     }
 
     this.loadCategories();
+  }
+
+  toggleMobileMenu() {
+    this.isMobileMenuOpen = !this.isMobileMenuOpen;
   }
 
   loadCategories() {
