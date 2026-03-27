@@ -10,6 +10,7 @@ import TuskSyS.bienestar_api.modules.users.entities.User;
 import TuskSyS.bienestar_api.modules.users.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import TuskSyS.bienestar_api.modules.breaks.dtos.BreakHistoryResponse;
 
 import java.util.UUID;
 import java.time.LocalDateTime;
@@ -101,5 +102,21 @@ public class BreakService {
         }
         
         return streak;
+    }
+
+    // === NUEVO MÉTODO: OBTENER HISTORIAL DETALLADO ===
+    public List<BreakHistoryResponse> getUserHistory(UUID userId) {
+        // 1. Buscamos todas las pausas del usuario ordenadas desde la más reciente
+        List<UserBreak> history = userBreakRepository.findByUserIdOrderByCompletedAtDesc(userId);
+
+        // 2. Traducimos cada "UserBreak" (Base de Datos) a un "BreakHistoryResponse" (Frontend)
+        return history.stream().map(record -> BreakHistoryResponse.builder()
+                .id(record.getId())
+                .title(record.getActiveBreak().getTitle())
+                .categoryName(record.getActiveBreak().getCategory().getName())
+                .durationSeconds(record.getActiveBreak().getDurationSeconds())
+                .completedAt(record.getCompletedAt())
+                .build()
+        ).toList();
     }
 }

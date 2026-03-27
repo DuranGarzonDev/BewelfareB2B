@@ -13,4 +13,5 @@ public class AuthResponse {
     private String token; // El famoso JWT que usaremos después
     private String role;
     private String fullName;
+    private String userId;
 }

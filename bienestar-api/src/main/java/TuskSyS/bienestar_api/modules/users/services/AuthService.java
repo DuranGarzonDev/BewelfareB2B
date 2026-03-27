@@ -27,7 +27,7 @@ public class AuthService {
             throw new RuntimeException("El correo ya está en uso"); 
         }
 
-        // 2. Construir el nuevo usuario
+        // 2. Construir el nuevo usuario (Aún sin ID)
         User user = User.builder()
                 .fullName(request.getFullName())
                 .email(request.getEmail())
@@ -36,21 +36,23 @@ public class AuthService {
                 .isActive(true) // Forzamos a que el usuario nazca activo
                 .build();
 
-        // 3. Guardar en PostgreSQL
-        userRepository.save(user);
+        // 3. Guardar en PostgreSQL (¡Aquí nace el UUID!)
+        User savedUser = userRepository.save(user);
 
         // 4. Generar el JWT real
-        String jwtToken = jwtService.generateToken(user.getEmail());
+        String jwtToken = jwtService.generateToken(savedUser.getEmail());
 
+        // 5. Devolver el paquete completo incluyendo el UUID autogenerado
         return AuthResponse.builder()
                 .token(jwtToken)
-                .role(user.getRole())
-                .fullName(user.getFullName())
+                .role(savedUser.getRole())
+                .fullName(savedUser.getFullName())
+                .userId(savedUser.getId().toString()) // <-- ¡El toque mágico agregado!
                 .build();
     }
 
     // ==========================================
-    // MÉTODO DE LOGIN (¡Ahora sí existe!)
+    // MÉTODO DE LOGIN
     // ==========================================
     public AuthResponse login(LoginRequest request) {
         try {
@@ -68,6 +70,7 @@ public class AuthService {
                     .token(jwtToken)
                     .role(user.getRole())
                     .fullName(user.getFullName())
+                    .userId(user.getId().toString()) // <-- Este ya lo tenías listo
                     .build();
 
         } catch (Exception e) {

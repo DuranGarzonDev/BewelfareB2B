@@ -1,5 +1,6 @@
 package TuskSyS.bienestar_api.modules.breaks.controllers;
 
+import TuskSyS.bienestar_api.modules.breaks.dtos.BreakHistoryResponse;
 import TuskSyS.bienestar_api.modules.breaks.entities.ActiveBreak;
 import TuskSyS.bienestar_api.modules.breaks.entities.Category;
 import TuskSyS.bienestar_api.modules.breaks.services.BreakService;
@@ -72,4 +73,13 @@ public class BreakController {
         return ResponseEntity.ok(userRepository.findAll());
     }
     
+    // Importa el DTO arriba si no lo tienes: 
+    // import TuskSyS.bienestar_api.modules.breaks.dtos.BreakHistoryResponse;
+
+    // === RUTA PARA PEDIR EL HISTORIAL ===
+    // Ejemplo: GET /api/breaks/history/{userId}
+    @GetMapping("/history/{userId}")
+    public ResponseEntity<List<BreakHistoryResponse>> getUserHistory(@PathVariable UUID userId) {
+        return ResponseEntity.ok(breakService.getUserHistory(userId));
+    }
 }

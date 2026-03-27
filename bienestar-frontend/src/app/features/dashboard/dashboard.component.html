@@ -12,9 +12,13 @@
     </div>
 
     <nav class="flex-1 p-4 space-y-2">
-      <a href="#" class="block py-3 px-4 rounded-lg bg-indigo-800 text-white font-medium transition shadow-inner">Inicio</a>
-      <a href="#" class="block py-3 px-4 rounded-lg hover:bg-indigo-600 text-indigo-100 transition">Mis Pausas Activas</a>
-      <a href="#" class="block py-3 px-4 rounded-lg hover:bg-indigo-600 text-indigo-100 transition">Estadísticas</a>
+      <a routerLink="/dashboard" class="block py-3 px-4 rounded-lg bg-indigo-800 text-white font-medium transition shadow-inner">Inicio</a>
+      <a routerLink="/history" class="block py-3 px-4 rounded-lg hover:bg-indigo-600 text-indigo-100 transition">Mis Pausas Activas</a>
+      <a routerLink="/statistics" class="block py-3 px-4 rounded-lg hover:bg-indigo-600 text-indigo-100 transition">Estadísticas</a>
+      <div *ngIf="role === 'ADMIN'" class="pt-4 mt-4 border-t border-indigo-600">
+        <p class="px-4 text-xs font-bold text-indigo-300 uppercase tracking-wider mb-2">Administración</p>
+        <a routerLink="/admin" class="block py-3 px-4 rounded-lg hover:bg-indigo-600 text-indigo-100 transition">Panel de Control</a>
+      </div>
     </nav>
 
     <div class="p-4 border-t border-indigo-600">

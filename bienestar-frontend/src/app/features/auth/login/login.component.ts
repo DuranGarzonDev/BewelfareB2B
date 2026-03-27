@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule, Router } from '@angular/router'; // Añadimos Router
+import { RouterModule, Router } from '@angular/router'; 
 import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
@@ -27,15 +27,21 @@ export class LoginComponent {
 
   onSubmit() {
     this.authService.login(this.credentials).subscribe({
-      next: (response) => {
+      next: (response: any) => {
+        // 👇 AQUÍ GUARDAMOS TODO DINÁMICAMENTE EN EL NAVEGADOR
+        localStorage.setItem('token', response.token);
+        localStorage.setItem('fullName', response.fullName);
+        localStorage.setItem('role', response.role);
+        localStorage.setItem('userId', response.userId); // ¡El UUID atrapado!
+
         // Mostramos el Toast elegante
         this.toastMessage = `¡Bienvenido, ${response.fullName}!`;
         this.showToast = true;
 
-        // Esperamos 1.5 segundos y lo mandamos al Dashboard
+        // Esperamos 800ms y lo mandamos al Dashboard
         setTimeout(() => {
           this.showToast = false;
-          this.router.navigate(['/dashboard']); // <-- Nos llevará a la siguiente fase
+          this.router.navigate(['/dashboard']); 
         }, 800);
       },
       error: (err) => {

@@ -1,13 +1,13 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { trigger, style, animate, transition } from '@angular/animations';
 import { BreakService } from '../../core/services/break.service'; 
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './dashboard.component.html',
   animations: [
     trigger('toastAnimation', [
@@ -30,7 +30,9 @@ export class DashboardComponent implements OnInit {
   activeBreaks: any[] = []; 
   completedBreaksCount: number = 0;
   currentStreak: number = 0;
-  myUserId: string = '4985ab5a-8646-412c-b853-032c7ef614e4'; // Tu UUID
+  
+  // 👇 INICIA VACÍO
+  myUserId: string = ''; 
 
   // === VARIABLES DEL MODAL Y RELOJ ===
   isModalOpen = false;
@@ -47,6 +49,9 @@ export class DashboardComponent implements OnInit {
   ngOnInit() {
     this.userName = localStorage.getItem('fullName');
     this.role = localStorage.getItem('role');
+    
+    // 👇 LO ATRAPAMOS DINÁMICAMENTE AQUÍ
+    this.myUserId = localStorage.getItem('userId') || ''; 
 
     if (!localStorage.getItem('token')) {
       this.router.navigate(['/login']);
@@ -71,15 +76,18 @@ export class DashboardComponent implements OnInit {
     });
   }
 
-loadStats() {
-  this.breakService.getUserStats(this.myUserId).subscribe({
-    next: (stats: any) => {
-      this.completedBreaksCount = stats.pausasCompletadas;
-      this.currentStreak = stats.rachaDias; // <-- ATRAPAMOS LA RACHA
-    },
-    error: (err: any) => console.error('Error cargando estadísticas:', err)
-  });
-}
+  loadStats() {
+    // Pequeña validación de seguridad
+    if (!this.myUserId) return; 
+
+    this.breakService.getUserStats(this.myUserId).subscribe({
+      next: (stats: any) => {
+        this.completedBreaksCount = stats.pausasCompletadas;
+        this.currentStreak = stats.rachaDias; 
+      },
+      error: (err: any) => console.error('Error cargando estadísticas:', err)
+    });
+  }
 
   logout() {
     localStorage.clear(); 
@@ -89,7 +97,7 @@ loadStats() {
   // === LÓGICA DEL TEMPORIZADOR ===
   openModal(breakItem: any) {
     this.currentBreak = breakItem;
-    this.timeLeft = breakItem.durationSeconds; // Tomamos los segundos de la BD
+    this.timeLeft = breakItem.durationSeconds; 
     this.isModalOpen = true;
     this.startTimer();
   }
@@ -98,7 +106,7 @@ loadStats() {
     this.isModalOpen = false;
     this.currentBreak = null;
     if (this.timerInterval) {
-      clearInterval(this.timerInterval); // Apagamos el reloj si cierran la ventana
+      clearInterval(this.timerInterval); 
     }
   }
 
@@ -106,24 +114,22 @@ loadStats() {
     this.timerInterval = setInterval(() => {
       if (this.timeLeft > 0) {
         this.timeLeft--;
-        // 👇 EL PELLIZCO MÁGICO: Le decimos a Angular que actualice el número en pantalla CADA SEGUNDO
         this.cdr.detectChanges(); 
       } else {
-        // Cuando llega a 0
         clearInterval(this.timerInterval);
         this.finishBreak();
       }
-    }, 700); // 1000 milisegundos = 1 segundo
+    }, 700); 
   }
 
   finishBreak() {
-    // Le avisamos a Spring Boot que terminamos
+    if (!this.myUserId) return;
+
     this.breakService.completeBreak(this.currentBreak.id, this.myUserId).subscribe({
       next: () => {
         this.closeModal();
-        this.loadStats(); // Recargamos el contador del Dashboard (Magia pura)
+        this.loadStats(); 
         
-        // Disparamos un Toast de felicitación
         this.toastMessage = `¡Excelente! Pausa completada.`;
         this.showToast = true;
         setTimeout(() => { this.showToast = false; this.cdr.detectChanges(); }, 3000);
