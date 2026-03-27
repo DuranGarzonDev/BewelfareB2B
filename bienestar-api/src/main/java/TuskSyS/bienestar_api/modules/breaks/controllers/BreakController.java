@@ -53,11 +53,13 @@ public class BreakController {
     // 3. Cambiamos Long por UUID aquí
     @GetMapping("/stats/{userId}")
     public ResponseEntity<?> getUserStats(@PathVariable UUID userId) {
-        long count = breakService.getCompletedBreaksCount(userId);
+        long totalBreaks = breakService.getCompletedBreaksCount(userId);
+        long streak = breakService.calculateStreak(userId); // Llamamos a nuestro nuevo método
         
+        // Enviamos ambas variables al frontend
         return ResponseEntity.ok().body(java.util.Map.of(
-            "pausasCompletadas", count,
-            "rachaDias", 0 
+            "pausasCompletadas", totalBreaks,
+            "rachaDias", streak 
         ));
     }
 

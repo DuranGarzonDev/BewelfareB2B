@@ -1,46 +1,83 @@
 package TuskSyS.bienestar_api.config;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 @Service
 public class JwtService {
 
-    // Spring Boot inyecta automáticamente los valores de nuestro application.yml aquí
     @Value("${jwt.secret}")
     private String secretKey;
 
     @Value("${jwt.expiration}")
     private long jwtExpiration;
 
-    // Método principal para generar el token a partir del email del usuario
+    // === MÉTODOS DE CREACIÓN (Los que ya tenías) ===
+    
     public String generateToken(String username) {
         return generateToken(new HashMap<>(), username);
     }
 
-    // Método que construye la "tarjeta de acceso"
     public String generateToken(Map<String, Object> extraClaims, String username) {
         return Jwts.builder()
-                .setClaims(extraClaims) // Datos extra (opcional)
-                .setSubject(username) // El "dueño" del token (el email)
-                .setIssuedAt(new Date(System.currentTimeMillis())) // Fecha de creación
-                .setExpiration(new Date(System.currentTimeMillis() + jwtExpiration)) // Fecha de caducidad
-                .signWith(getSignInKey(), SignatureAlgorithm.HS256) // La firma criptográfica
-                .compact(); // Empaquetar todo en el famoso String codificado
+                .setClaims(extraClaims) 
+                .setSubject(username) 
+                .setIssuedAt(new Date(System.currentTimeMillis())) 
+                .setExpiration(new Date(System.currentTimeMillis() + jwtExpiration)) 
+                .signWith(getSignInKey(), SignatureAlgorithm.HS256) 
+                .compact(); 
     }
 
-    // Método interno para leer nuestra clave secreta
     private Key getSignInKey() {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    // === NUEVOS MÉTODOS DE LECTURA Y VALIDACIÓN ===
+
+    // 1. Extraer el correo (subject) del token
+    public String extractUsername(String token) {
+        return extractClaim(token, Claims::getSubject);
+    }
+
+    // 2. Validar si el token pertenece a este usuario y si no ha expirado
+    public boolean isTokenValid(String token, UserDetails userDetails) {
+        final String username = extractUsername(token);
+        return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
+    }
+
+    // 3. Revisar la fecha de caducidad
+    private boolean isTokenExpired(String token) {
+        return extractExpiration(token).before(new Date());
+    }
+
+    private Date extractExpiration(String token) {
+        return extractClaim(token, Claims::getExpiration);
+    }
+
+    // Herramientas internas para desempaquetar el token usando la clave secreta
+    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+        final Claims claims = extractAllClaims(token);
+        return claimsResolver.apply(claims);
+    }
+
+    private Claims extractAllClaims(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(getSignInKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
     }
 }

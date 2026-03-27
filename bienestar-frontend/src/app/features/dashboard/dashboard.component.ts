@@ -29,6 +29,7 @@ export class DashboardComponent implements OnInit {
 
   activeBreaks: any[] = []; 
   completedBreaksCount: number = 0;
+  currentStreak: number = 0;
   myUserId: string = '4985ab5a-8646-412c-b853-032c7ef614e4'; // Tu UUID
 
   // === VARIABLES DEL MODAL Y RELOJ ===
@@ -70,12 +71,15 @@ export class DashboardComponent implements OnInit {
     });
   }
 
-  loadStats() {
-    this.breakService.getUserStats(this.myUserId).subscribe({
-      next: (stats: any) => this.completedBreaksCount = stats.pausasCompletadas,
-      error: (err: any) => console.error('Error cargando estadísticas:', err)
-    });
-  }
+loadStats() {
+  this.breakService.getUserStats(this.myUserId).subscribe({
+    next: (stats: any) => {
+      this.completedBreaksCount = stats.pausasCompletadas;
+      this.currentStreak = stats.rachaDias; // <-- ATRAPAMOS LA RACHA
+    },
+    error: (err: any) => console.error('Error cargando estadísticas:', err)
+  });
+}
 
   logout() {
     localStorage.clear(); 

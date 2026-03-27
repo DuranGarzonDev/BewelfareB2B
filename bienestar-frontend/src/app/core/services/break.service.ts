@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http'; // 1. Importamos HttpHeaders
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -10,20 +10,24 @@ export class BreakService {
 
   constructor(private http: HttpClient) { }
 
-  // Método para traer todas las pausas activas del backend
+  // 2. Método auxiliar para agarrar el pase VIP de la billetera (localStorage)
+  private getHeaders(): HttpHeaders {
+    const token = localStorage.getItem('token');
+    return new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+  }
+
+  // 3. Le adjuntamos los headers a cada petición
   getAllBreaks(): Observable<any[]> {
-    return this.http.get<any[]>(this.apiUrl);
+    return this.http.get<any[]>(this.apiUrl, { headers: this.getHeaders() });
   }
 
-  // === NUEVOS MÉTODOS ===
-
-  // 2. Traer las estadísticas del usuario (El contador)
   getUserStats(userId: string): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/stats/${userId}`);
+    return this.http.get<any>(`${this.apiUrl}/stats/${userId}`, { headers: this.getHeaders() });
   }
 
-  // 3. Registrar que el usuario completó una pausa
   completeBreak(breakId: number, userId: string): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/${breakId}/complete/${userId}`, {});
+    return this.http.post<any>(`${this.apiUrl}/${breakId}/complete/${userId}`, {}, { headers: this.getHeaders() });
   }
 }
