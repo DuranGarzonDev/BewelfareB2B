@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -21,7 +22,7 @@ public class BreakController {
     // === RUTAS PARA CATEGORÍAS ===
     @GetMapping("/categories")
     public ResponseEntity<List<Category>> getAllCategories() {
-        return ResponseEntity.ok(breakService.getAllCategories());
+        return ResponseEntity.ok(breakService.getCategories()); // Alineado con el servicio
     }
 
     @PostMapping("/categories")
@@ -30,20 +31,17 @@ public class BreakController {
     }
 
     // === RUTAS PARA PAUSAS ACTIVAS ===
-    
-    // 1. OBTENER PAUSAS (AHORA FILTRADAS POR EMPRESA MEDIANTE userId)
-    @GetMapping("/{userId}")
-    public ResponseEntity<List<ActiveBreak>> getAvailableBreaks(@PathVariable UUID userId) {
-        return ResponseEntity.ok(breakService.getAvailableBreaks(userId));
+    @GetMapping
+    public ResponseEntity<List<ActiveBreak>> getAllBreaks(@RequestParam(required = false) UUID userId) {
+        return ResponseEntity.ok(breakService.getAllBreaks(userId)); // Se le pasa el UUID
     }
 
-    // 2. CREAR PAUSA (AHORA REQUIERE EL creatorId PARA SABER A QUÉ EMPRESA ASIGNARLA)
-    @PostMapping("/{creatorId}")
+    @PostMapping
     public ResponseEntity<ActiveBreak> createBreak(
-            @PathVariable UUID creatorId,
-            @RequestBody ActiveBreak activeBreak, 
-            @RequestParam Long categoryId) {
-        return ResponseEntity.ok(breakService.createBreak(activeBreak, categoryId, creatorId));
+            @RequestBody Map<String, Object> payload, // Alineado con Map para aceptar todo el JSON
+            @RequestParam Long categoryId,
+            @RequestParam UUID userId) {
+        return ResponseEntity.ok(breakService.createBreak(payload, categoryId, userId));
     }
 
     @PostMapping("/{breakId}/complete/{userId}")
@@ -55,27 +53,24 @@ public class BreakController {
         }
     }
 
+    // === RUTAS DE ESTADÍSTICAS E HISTORIAL ===
     @GetMapping("/stats/{userId}")
     public ResponseEntity<?> getUserStats(@PathVariable UUID userId) {
-        long totalBreaks = breakService.getCompletedBreaksCount(userId);
-        long streak = breakService.calculateStreak(userId); 
-        
-        return ResponseEntity.ok().body(java.util.Map.of(
-            "pausasCompletadas", totalBreaks,
-            "rachaDias", streak 
-        ));
+        // Se llama directo al mapa combinado del servicio
+        return ResponseEntity.ok(breakService.getUserStats(userId));
     }
 
+    @GetMapping("/history/{userId}")
+    public ResponseEntity<List<BreakHistoryResponse>> getUserHistory(@PathVariable UUID userId) {
+        return ResponseEntity.ok(breakService.getUserHistory(userId));
+    }
+
+    // === RUTA ESPÍA PARA VER LOS UUID DE LOS USUARIOS ===
     @org.springframework.beans.factory.annotation.Autowired
     private TuskSyS.bienestar_api.modules.users.repositories.UserRepository userRepository;
 
     @GetMapping("/spy-users")
     public ResponseEntity<?> spyUsers() {
         return ResponseEntity.ok(userRepository.findAll());
-    }
-    
-    @GetMapping("/history/{userId}")
-    public ResponseEntity<List<BreakHistoryResponse>> getUserHistory(@PathVariable UUID userId) {
-        return ResponseEntity.ok(breakService.getUserHistory(userId));
     }
 }

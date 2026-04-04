@@ -40,6 +40,24 @@ public class User implements UserDetails { // <-- ¡Nuevo contrato de seguridad!
     @Builder.Default
     private boolean isActive = true; 
 
+    // ==========================================
+    // 🎮 MOTOR DE GAMIFICACIÓN
+    // ==========================================
+    @Column(nullable = false)
+    @Builder.Default
+    private Integer coins = 0; // Monedas acumuladas
+
+    @Column(nullable = false)
+    @Builder.Default
+    private Integer currentStreak = 0; // Racha actual
+
+    @Column(nullable = false)
+    @Builder.Default
+    private Integer maxStreak = 0; // Récord histórico (Punto 15)
+
+    @Column(name = "last_break_date")
+    private java.time.LocalDate lastBreakDate; // Para saber si hoy ya hizo pausa
+
     // 👇 NUEVA RELACIÓN MULTI-TENANT 👇
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id")

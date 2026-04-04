@@ -40,4 +40,11 @@ public class ActiveBreak {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id")
     private TuskSyS.bienestar_api.modules.companies.entities.Company company;
+
+    // ==========================================
+    // 🎮 VALOR DE LA PAUSA (Punto 16)
+    // ==========================================
+    @Column(nullable = false)
+    @Builder.Default
+    private Integer coinReward = 10; // Por defecto toda pausa da 10 monedas (puedes cambiarlo a futuro)
 }

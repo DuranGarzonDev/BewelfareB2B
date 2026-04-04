@@ -27,4 +27,11 @@ export class UserService {
   updateProfile(userId: string, profileData: any): Observable<any> {
     return this.http.put<any>(`${this.apiUrl}/profile/${userId}`, profileData, { headers: this.getHeaders() });
   }
+
+  // ==========================================
+  // 🏆 TRAER EL LEADERBOARD (Aislado)
+  // ==========================================
+  getLeaderboard(userId: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/leaderboard/${userId}`, { headers: this.getHeaders() });
+  }
 }

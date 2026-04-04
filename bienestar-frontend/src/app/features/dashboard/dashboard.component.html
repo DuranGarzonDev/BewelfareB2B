@@ -25,7 +25,6 @@
     class="absolute md:relative z-50 w-64 h-full bg-red-700 text-white flex flex-col shadow-2xl md:shadow-xl transform transition-transform duration-300 ease-in-out md:translate-x-0 shrink-0">
     
     <div class="hidden md:flex p-6 font-black text-xl items-center gap-2 border-b border-red-600/50 shrink-0">
-      <!-- <svg class="w-8 h-8 text-red-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> -->
       <span>BWelfare <span class="text-red-200 text-sm">UFPSO</span></span>
     </div>
 
@@ -72,72 +71,120 @@
           </p>
         </div>
         <div class="h-10 w-10 md:h-12 md:w-12 rounded-full bg-red-100 border-2 border-red-200 flex justify-center items-center text-red-700 font-bold text-lg md:text-xl uppercase shadow-sm shrink-0 overflow-hidden">
-          
           <img *ngIf="profilePic" [src]="profilePic" alt="Avatar" class="w-full h-full object-cover">
-          
           <span *ngIf="!profilePic">{{ userName ? userName.charAt(0) : 'U' }}</span>
-          
         </div>
       </div>
     </header>
 
     <div class="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
-      <div class="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-gray-100 flex-1 hover:shadow-md transition-shadow">
+      <div class="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
         <h3 class="text-xs md:text-sm font-bold text-gray-400 mb-1 uppercase tracking-wider">Pausas <span class="hidden sm:inline">Completadas</span></h3>
         <p class="text-3xl md:text-4xl font-black text-slate-800">{{ completedBreaksCount }}</p>
       </div>
       <div class="bg-white p-4 md:p-6 rounded-2xl shadow-sm border-l-4 border-green-500 hover:shadow-md transition-shadow">
-        <h3 class="text-gray-400 text-xs md:text-sm font-bold uppercase tracking-wider">Racha <span class="hidden sm:inline">Actual</span></h3>
+        <h3 class="text-gray-400 text-xs md:text-sm font-bold uppercase tracking-wider flex items-center gap-1"><span class="text-green-500">🔥</span> Racha Actual</h3>
         <p class="text-3xl md:text-4xl font-black text-slate-800">{{ currentStreak }} <span class="text-xs md:text-sm font-medium text-gray-500 ml-1">Días</span></p>
       </div>
+      <div class="bg-white p-4 md:p-6 rounded-2xl shadow-sm border-l-4 border-yellow-500 hover:shadow-md transition-shadow col-span-2 md:col-span-1">
+        <h3 class="text-gray-400 text-xs md:text-sm font-bold uppercase tracking-wider flex items-center gap-1"><span class="text-yellow-500">🪙</span> Billetera</h3>
+        <p class="text-3xl md:text-4xl font-black text-slate-800">{{ coins }} <span class="text-xs md:text-sm font-medium text-gray-500 ml-1">Coins</span></p>
+      </div>
     </div>
     
-    <div class="mt-8 md:mt-12">
-      <div class="flex justify-between items-center mb-6">
-        <h2 class="text-xl md:text-2xl font-black text-slate-900">Pausas Recomendadas</h2>
-        <button class="text-red-700 hover:text-red-800 font-bold text-sm transition-colors flex items-center gap-1">
-          Ver todas <svg class="w-4 h-4 hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
-        </button>
-      </div>
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6 md:gap-8 mt-8 md:mt-12">
+      
+      <div class="xl:col-span-2">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-xl md:text-2xl font-black text-slate-900">Pausas Recomendadas</h2>
+          <button class="text-red-700 hover:text-red-800 font-bold text-sm transition-colors flex items-center gap-1">
+            Ver todas <svg class="w-4 h-4 hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+          </button>
+        </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 md:gap-6">
-        
-        <div *ngFor="let breakItem of activeBreaks" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300 flex flex-col transform hover:-translate-y-1">
-          <div class="h-32 md:h-40 bg-red-50 flex justify-center items-center overflow-hidden border-b border-red-100/50">
-            <img [src]="breakItem.mediaUrl || 'https://cdn-icons-png.flaticon.com/512/3305/3305803.png'" alt="Imagen de pausa" class="h-20 md:h-24 object-contain drop-shadow-sm transition-transform hover:scale-110 duration-500">
-          </div>
-          
-          <div class="p-5 md:p-6 flex-1 flex flex-col">
-            <div class="flex justify-between items-start mb-3">
-              <span class="bg-red-100 text-red-700 text-[10px] md:text-xs font-bold px-2 md:px-3 py-1 rounded-full uppercase tracking-wide border border-red-200 truncate max-w-[60%]">
-                {{ breakItem.category?.name || 'General' }}
-              </span>
-              <span class="flex items-center text-gray-500 text-xs md:text-sm font-bold shrink-0">
-                <svg class="w-3.5 h-3.5 md:w-4 md:h-4 mr-1 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                {{ breakItem.durationSeconds }}s
-              </span>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 md:gap-6">
+          <div *ngFor="let breakItem of activeBreaks" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300 flex flex-col transform hover:-translate-y-1">
+            <div class="h-32 md:h-40 bg-red-50 flex justify-center items-center overflow-hidden border-b border-red-100/50 relative">
+              <div class="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full shadow-sm flex items-center gap-1 border border-yellow-200">
+                <span class="text-yellow-500 text-sm">🪙</span>
+                <span class="font-black text-slate-800 text-xs">+{{ breakItem.coinReward || 10 }}</span>
+              </div>
+              <img [src]="breakItem.mediaUrl || 'https://cdn-icons-png.flaticon.com/512/3305/3305803.png'" alt="Imagen de pausa" class="h-20 md:h-24 object-contain drop-shadow-sm transition-transform hover:scale-110 duration-500">
             </div>
             
-            <h3 class="text-lg md:text-xl font-black text-slate-900 mb-2 leading-tight">{{ breakItem.title }}</h3>
-            <p class="text-gray-600 text-xs md:text-sm flex-1 line-clamp-2 md:line-clamp-3 font-medium">{{ breakItem.description }}</p>
-            
-            <button (click)="openModal(breakItem)" class="mt-4 md:mt-6 w-full py-2.5 md:py-3 bg-red-50 hover:bg-red-700 text-red-700 hover:text-white rounded-xl font-bold transition-colors duration-300 border border-red-100 hover:border-red-700 text-sm md:text-base">
-              Iniciar Pausa
-            </button>
+            <div class="p-5 md:p-6 flex-1 flex flex-col">
+              <div class="flex justify-between items-start mb-3">
+                <span class="bg-red-100 text-red-700 text-[10px] md:text-xs font-bold px-2 md:px-3 py-1 rounded-full uppercase tracking-wide border border-red-200 truncate max-w-[60%]">
+                  {{ breakItem.category?.name || 'General' }}
+                </span>
+                <span class="flex items-center text-gray-500 text-xs md:text-sm font-bold shrink-0">
+                  <svg class="w-3.5 h-3.5 md:w-4 md:h-4 mr-1 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                  {{ breakItem.durationSeconds }}s
+                </span>
+              </div>
+              
+              <h3 class="text-lg md:text-xl font-black text-slate-900 mb-2 leading-tight">{{ breakItem.title }}</h3>
+              <p class="text-gray-600 text-xs md:text-sm flex-1 line-clamp-2 md:line-clamp-3 font-medium">{{ breakItem.description }}</p>
+              
+              <button (click)="openModal(breakItem)" class="mt-4 md:mt-6 w-full py-2.5 md:py-3 bg-red-50 hover:bg-red-700 text-red-700 hover:text-white rounded-xl font-bold transition-colors duration-300 border border-red-100 hover:border-red-700 text-sm md:text-base">
+                Iniciar Pausa
+              </button>
+            </div>
+          </div>
+
+          <div *ngIf="activeBreaks.length === 0" class="col-span-full bg-white rounded-2xl p-6 md:p-10 text-center border-2 border-dashed border-gray-200">
+            <div class="w-12 h-12 md:w-16 md:h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
+              <svg class="h-6 w-6 md:h-8 md:w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2-2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+            </div>
+            <h3 class="text-lg md:text-xl font-black text-slate-900">No hay pausas disponibles</h3>
+            <p class="text-gray-500 mt-1 md:mt-2 font-medium text-sm md:text-base">Aún no se han creado pausas activas en la base de datos.</p>
           </div>
         </div>
-
-        <div *ngIf="activeBreaks.length === 0" class="col-span-full bg-white rounded-2xl p-6 md:p-10 text-center border-2 border-dashed border-gray-200">
-          <div class="w-12 h-12 md:w-16 md:h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
-            <svg class="h-6 w-6 md:h-8 md:w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2-2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-          </div>
-          <h3 class="text-lg md:text-xl font-black text-slate-900">No hay pausas disponibles</h3>
-          <p class="text-gray-500 mt-1 md:mt-2 font-medium text-sm md:text-base">Aún no se han creado pausas activas en la base de datos.</p>
-        </div>
-
       </div>
+
+      <div class="xl:col-span-1">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden sticky top-6">
+          <div class="p-6 bg-slate-900 text-white border-b border-gray-100 flex items-center justify-between">
+            <h2 class="text-lg md:text-xl font-black flex items-center gap-2">
+              <span class="text-yellow-400 text-2xl">🏆</span> Salón de la Fama
+            </h2>
+          </div>
+          
+          <div class="p-0">
+            <div *ngFor="let user of leaderboard; let i = index" 
+                 class="flex items-center gap-4 p-4 border-b border-gray-50 hover:bg-gray-50 transition-colors"
+                 [ngClass]="{'bg-yellow-50/30': i === 0, 'bg-gray-50/50': i === 1, 'bg-orange-50/30': i === 2}">
+              
+              <div class="w-8 flex justify-center shrink-0">
+                <span *ngIf="i === 0" class="text-2xl drop-shadow-sm">🥇</span>
+                <span *ngIf="i === 1" class="text-2xl drop-shadow-sm">🥈</span>
+                <span *ngIf="i === 2" class="text-2xl drop-shadow-sm">🥉</span>
+                <span *ngIf="i > 2" class="text-gray-400 font-black text-lg">{{ i + 1 }}</span>
+              </div>
+              
+              <div class="h-10 w-10 rounded-full bg-slate-100 border-2 border-white shadow-sm flex justify-center items-center text-slate-800 font-bold uppercase overflow-hidden shrink-0">
+                <img *ngIf="user.profilePictureUrl" [src]="user.profilePictureUrl" alt="Avatar" class="w-full h-full object-cover">
+                <span *ngIf="!user.profilePictureUrl">{{ user.fullName ? user.fullName.charAt(0) : 'U' }}</span>
+              </div>
+              
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-bold text-slate-900 truncate">{{ user.fullName }}</p>
+                <div class="flex items-center gap-3 mt-0.5">
+                  <span class="text-xs font-bold text-gray-500 flex items-center gap-1"><span class="text-yellow-500">🪙</span> {{ user.coins }}</span>
+                  <span class="text-xs font-bold text-gray-400 flex items-center gap-1"><span class="text-green-500">🔥</span> {{ user.currentStreak }} d</span>
+                </div>
+              </div>
+
+            </div>
+
+            <div *ngIf="leaderboard.length === 0" class="p-8 text-center">
+              <p class="text-gray-500 text-sm font-medium">Aún no hay usuarios en la tabla. ¡Sé el primero!</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
-    
   </main>
 </div>
 

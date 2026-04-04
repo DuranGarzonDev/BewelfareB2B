@@ -29,8 +29,11 @@ export class DashboardComponent implements OnInit {
   toastMessage = '';
   
   activeBreaks: any[] = []; 
+  leaderboard: any[] = []; // 🏆 Nuestro Top 10
+  
   completedBreaksCount: number = 0;
   currentStreak: number = 0;
+  coins: number = 0; // 🪙 Billetera del usuario
   
   myUserId: string = ''; 
 
@@ -66,25 +69,48 @@ export class DashboardComponent implements OnInit {
         this.cdr.detectChanges(); 
       }, 2500);
 
-      this.loadBreaks();
-      this.loadStats();
-      this.userService.getProfile(this.myUserId).subscribe({
-        next: (data) => {
-          this.profilePic = data.profilePictureUrl;
-          this.cdr.detectChanges(); 
-        }
-      });
+      this.loadAllData();
     }
+  }
+
+  loadAllData() {
+    this.loadBreaks();
+    this.loadStats();
+    this.loadProfile();
+    this.loadLeaderboard();
   }
 
   toggleMobileMenu() {
     this.isMobileMenuOpen = !this.isMobileMenuOpen;
   }
 
-  loadBreaks() {
-    // 👇 ACTUALIZADO: Le pasamos el ID del usuario al servicio
+  loadProfile() {
     if (!this.myUserId) return;
+    this.userService.getProfile(this.myUserId).subscribe({
+      next: (data) => {
+        this.profilePic = data.profilePictureUrl;
+        this.coins = data.coins || 0; // 🪙 Extraemos las monedas de la BD
+        this.currentStreak = data.currentStreak || 0; // 🔥 Extraemos la racha oficial
+        this.cdr.detectChanges(); 
+      }
+    });
+  }
+
+  loadLeaderboard() {
+    if (!this.myUserId) return; // Validación de seguridad
     
+    // 👇 Le pasamos el ID al servicio
+    this.userService.getLeaderboard(this.myUserId).subscribe({
+      next: (data) => {
+        this.leaderboard = data;
+        this.cdr.detectChanges();
+      },
+      error: (err) => console.error('Error cargando Leaderboard:', err)
+    });
+  }
+
+  loadBreaks() {
+    if (!this.myUserId) return;
     this.breakService.getAllBreaks(this.myUserId).subscribe({
       next: (data: any[]) => this.activeBreaks = data,
       error: (err: any) => console.error('Error cargando pausas:', err)
@@ -93,11 +119,10 @@ export class DashboardComponent implements OnInit {
 
   loadStats() {
     if (!this.myUserId) return; 
-
     this.breakService.getUserStats(this.myUserId).subscribe({
       next: (stats: any) => {
         this.completedBreaksCount = stats.pausasCompletadas;
-        this.currentStreak = stats.rachaDias; 
+        // Ya no usamos la racha de aquí, usamos la del Profile que es más precisa
       },
       error: (err: any) => console.error('Error cargando estadísticas:', err)
     });
@@ -141,9 +166,13 @@ export class DashboardComponent implements OnInit {
     this.breakService.completeBreak(this.currentBreak.id, this.myUserId).subscribe({
       next: () => {
         this.closeModal();
-        this.loadStats(); 
         
-        this.toastMessage = `¡Excelente! Pausa completada.`;
+        // RECARGAMOS TODO PARA VER LA MAGIA EN TIEMPO REAL 🚀
+        this.loadStats(); 
+        this.loadProfile(); 
+        this.loadLeaderboard(); 
+        
+        this.toastMessage = `¡Excelente! +${this.currentBreak.coinReward || 10} Coins ganados.`;
         this.showToast = true;
         setTimeout(() => { this.showToast = false; this.cdr.detectChanges(); }, 3000);
       },

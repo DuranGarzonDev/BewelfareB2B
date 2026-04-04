@@ -24,6 +24,12 @@
       <a routerLink="/statistics" (click)="isMobileMenuOpen = false" class="block py-3 px-4 rounded-xl hover:bg-red-600 text-red-100 font-medium transition-colors">Estadísticas</a>
       <a routerLink="/profile" (click)="isMobileMenuOpen = false" class="block py-3 px-4 rounded-xl hover:bg-red-600 text-red-100 font-medium transition-colors">Mi Perfil</a>
       
+      
+      <div *ngIf="role === 'SUPERADMIN'" class="pt-4 mt-4 border-t border-red-600/50">
+        <p class="px-4 text-xs font-bold text-red-300 uppercase tracking-wider mb-2">Administración</p>
+        <a routerLink="/admin" (click)="isMobileMenuOpen = false" class="block py-3 px-4 rounded-xl hover:bg-red-600 text-red-100 font-medium transition-colors">Panel de Control</a>
+      </div>
+      
       <div class="pt-4 mt-4 border-t border-red-600/50">
         <p class="px-4 text-xs font-bold text-red-300 uppercase tracking-wider mb-2">Control Global</p>
         <a routerLink="/superadmin" (click)="isMobileMenuOpen = false" class="block py-3 px-4 rounded-xl bg-slate-900 text-white font-bold transition shadow-inner">Corporaciones</a>

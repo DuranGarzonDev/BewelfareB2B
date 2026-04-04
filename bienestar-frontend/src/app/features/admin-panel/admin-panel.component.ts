@@ -15,7 +15,6 @@ export class AdminPanelComponent implements OnInit {
   role: string | null = '';
   categories: any[] = [];
   
-  // 👇 NUEVO: Variable para atrapar el ID
   myUserId: string = '';
 
   toastMessage = '';
@@ -23,7 +22,8 @@ export class AdminPanelComponent implements OnInit {
   isError = false;
 
   newCategory = { name: '', description: '' };
-  newBreak = { title: '', description: '', durationSeconds: 60, mediaUrl: '', categoryId: null };
+  // 👇 NUEVO: Añadido coinReward con valor por defecto 10
+  newBreak = { title: '', description: '', durationSeconds: 60, mediaUrl: '', categoryId: null, coinReward: 10 };
   isMobileMenuOpen: boolean = false;
 
   constructor(
@@ -35,10 +35,9 @@ export class AdminPanelComponent implements OnInit {
   ngOnInit() {
     this.userName = localStorage.getItem('fullName');
     this.role = localStorage.getItem('role');
-    // 👇 NUEVO: Lo atrapamos de la billetera (localStorage)
     this.myUserId = localStorage.getItem('userId') || '';
 
-    if (this.role !== 'ADMIN') {
+    if (this.role !== 'ADMIN' && this.role !== 'SUPERADMIN') {
       this.router.navigate(['/dashboard']);
       return;
     }
@@ -80,16 +79,18 @@ export class AdminPanelComponent implements OnInit {
       title: this.newBreak.title,
       description: this.newBreak.description,
       durationSeconds: Number(this.newBreak.durationSeconds),
-      mediaUrl: this.newBreak.mediaUrl
+      mediaUrl: this.newBreak.mediaUrl,
+      // 👇 NUEVO: Enviamos las monedas al backend
+      coinReward: Number(this.newBreak.coinReward) 
     };
 
     const categoryId = Number(this.newBreak.categoryId);
 
-    // 👇 ACTUALIZADO: Le pasamos el this.myUserId al final
     this.breakService.createBreak(payload, categoryId, this.myUserId).subscribe({
       next: () => {
         this.showNotification('Pausa Activa guardada correctamente', false);
-        this.newBreak = { title: '', description: '', durationSeconds: 60, mediaUrl: '', categoryId: null };
+        // 👇 NUEVO: Reiniciamos el formulario incluyendo las monedas
+        this.newBreak = { title: '', description: '', durationSeconds: 60, mediaUrl: '', categoryId: null, coinReward: 10 };
       },
       error: (err) => {
         console.error("Error completo del backend:", err);

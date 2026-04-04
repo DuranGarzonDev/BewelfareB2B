@@ -18,8 +18,15 @@ export class BreakService {
   }
 
   // 👇 ACTUALIZADO: Ahora recibe el userId para filtrar por empresa
-  getAllBreaks(userId: string): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/${userId}`, { headers: this.getHeaders() });
+  // ==========================================
+  // OBTENER TODAS LAS PAUSAS (Actualizado)
+  // ==========================================
+  getAllBreaks(userId?: string): Observable<any[]> {
+    let url = this.apiUrl;
+    if (userId) {
+      url = `${this.apiUrl}?userId=${userId}`;
+    }
+    return this.http.get<any[]>(url, { headers: this.getHeaders() });
   }
 
   getUserStats(userId: string): Observable<any> {
@@ -45,7 +52,14 @@ export class BreakService {
   }
 
   // 👇 ACTUALIZADO: Ahora recibe el creatorId para saber a qué empresa asignar la pausa
-  createBreak(breakData: any, categoryId: number, creatorId: string): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/${creatorId}?categoryId=${categoryId}`, breakData, { headers: this.getHeaders() });
+  // ==========================================
+  // CREAR PAUSA (Asegúrate de que la URL tenga ambos parámetros)
+  // ==========================================
+  createBreak(breakData: any, categoryId: number, userId: string): Observable<any> {
+    return this.http.post(
+      `${this.apiUrl}?categoryId=${categoryId}&userId=${userId}`, // 👇 ¡EL SECRETO ESTÁ AQUÍ!
+      breakData, 
+      { headers: this.getHeaders() }
+    );
   }
 }
