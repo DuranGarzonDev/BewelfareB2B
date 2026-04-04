@@ -31,4 +31,9 @@ export class AuthService {
       })
     );
   }
+
+  // 👇 NUEVO MÉTODO PARA ENVIAR EL TOKEN DE GOOGLE
+  loginWithGoogle(token: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/google`, { token });
+  }
 }

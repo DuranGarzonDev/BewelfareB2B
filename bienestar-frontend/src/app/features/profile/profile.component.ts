@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { UserService } from '../../core/services/user.service'; // 👇 Importamos el nuevo servicio
+import { UserService } from '../../core/services/user.service';
 
 @Component({
   selector: 'app-profile',
@@ -20,8 +20,8 @@ export class ProfileComponent implements OnInit {
   showToast = false;
   toastMessage = '';
   isError = false;
-  isLoading = true; // Para saber si estamos trayendo datos
-  isSaving = false; // Para que el botón no se presione dos veces
+  isLoading = true;
+  isSaving = false;
 
   // Modelo de datos del perfil
   profileData = {
@@ -31,7 +31,7 @@ export class ProfileComponent implements OnInit {
     profilePictureUrl: ''
   };
 
-  constructor(private router: Router, private userService: UserService) {} // 👇 Inyectamos el servicio
+  constructor(private router: Router, private userService: UserService) {}
 
   ngOnInit() {
     this.role = localStorage.getItem('role');
@@ -49,18 +49,15 @@ export class ProfileComponent implements OnInit {
     this.isMobileMenuOpen = !this.isMobileMenuOpen;
   }
 
-  // 👇 FUNCIÓN PARA CARGAR DATOS DESDE POSTGRESQL
   loadProfile() {
     this.userService.getProfile(this.myUserId).subscribe({
       next: (data) => {
-        // Llenamos el formulario con lo que venga de la base de datos
         this.profileData = {
           fullName: data.fullName || '',
           email: data.email || '',
           bio: data.bio || '',
           profilePictureUrl: data.profilePictureUrl || ''
         };
-        // Actualizamos el nombre en la interfaz por si acaso
         this.userName = data.fullName;
         this.isLoading = false;
       },
@@ -72,8 +69,8 @@ export class ProfileComponent implements OnInit {
     });
   }
 
-  // 👇 FUNCIÓN PARA GUARDAR LOS CAMBIOS
   saveProfile() {
+    // Aunque estén bloqueados en la vista, validamos por seguridad
     if (!this.profileData.fullName || !this.profileData.email) {
       this.showNotification('Nombre y Correo son obligatorios', true);
       return;
@@ -83,7 +80,6 @@ export class ProfileComponent implements OnInit {
 
     this.userService.updateProfile(this.myUserId, this.profileData).subscribe({
       next: (updatedUser) => {
-        // Si todo sale bien, actualizamos el localStorage para que el resto de la app sepa tu nuevo nombre
         localStorage.setItem('fullName', updatedUser.fullName);
         this.userName = updatedUser.fullName;
         

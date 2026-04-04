@@ -14,6 +14,11 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import TuskSyS.bienestar_api.modules.users.dtos.GoogleLoginRequest;
+import org.springframework.web.client.RestTemplate;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -53,6 +58,21 @@ public class AuthService {
                 user.setRole("ADMIN");
                 userRepository.save(user);
                 System.out.println("👑 ¡ÉXITO! El usuario jddurang@ufpso.edu.co ha sido promovido a ADMIN.");
+            }
+        });
+    }
+
+    // ==========================================
+    // TRUCO DE ARQUITECTO: EL NACIMIENTO DEL SUPERADMIN
+    // ==========================================
+    
+    @PostConstruct
+    public void promoteTheOddProgrammerToSuperAdmin() {
+        userRepository.findByEmail("juangarzonmani@gmail.com").ifPresent(user -> {
+            if (!"SUPERADMIN".equals(user.getRole())) {
+                user.setRole("SUPERADMIN");
+                userRepository.save(user);
+                System.out.println("👑 THE ODD PROGRAMMER AL MANDO: juangarzonmani@gmail.com es ahora SUPERADMIN.");
             }
         });
     }
@@ -126,5 +146,73 @@ public class AuthService {
             e.printStackTrace();
             throw new RuntimeException("Fallo en el login: " + e.getMessage());
         }
+    }
+
+    // ==========================================
+    // MÉTODO DE LOGIN/REGISTRO CON GOOGLE
+    // ==========================================
+    public AuthResponse googleLogin(GoogleLoginRequest request) {
+        // 1. Validar el token con Google de forma segura usando RestTemplate
+        RestTemplate restTemplate = new RestTemplate();
+        String googleUrl = "https://oauth2.googleapis.com/tokeninfo?id_token=" + request.getToken();
+        
+        // Usamos Map<?, ?> para respetar el Type Safety de Java y quitarnos las advertencias
+        Map<?, ?> payload;
+        try {
+            payload = restTemplate.getForObject(googleUrl, Map.class);
+        } catch (Exception e) {
+            System.err.println("❌ ERROR: Token de Google inválido o caducado.");
+            throw new RuntimeException("Token de Google inválido");
+        }
+
+        if (payload == null || !payload.containsKey("email")) {
+            throw new RuntimeException("No se pudo extraer la información de Google");
+        }
+
+        // 2. Extraemos los datos que nos regaló Google (Casteo seguro)
+        String email = ((String) payload.get("email")).toLowerCase();
+        String name = (String) payload.get("name");
+        String picture = (String) payload.get("picture");
+
+        // 3. Buscamos si este usuario ya existe en nuestra base de datos
+        Optional<User> userOptional = userRepository.findByEmail(email);
+        User user;
+
+        if (userOptional.isPresent()) {
+            // ---> ES UN LOGIN <---
+            user = userOptional.get();
+            // Truco: Actualizamos su foto por si la cambió en Google recientemente
+            user.setProfilePictureUrl(picture);
+            user = userRepository.save(user);
+        } else {
+            // ---> ES UN REGISTRO NUEVO (Hacemos el Auto-Join) <---
+            String domain = email.substring(email.indexOf("@") + 1);
+            Company assignedCompany = companyRepository.findByEmailDomain(domain).orElse(null);
+
+            user = User.builder()
+                    .fullName(name)
+                    .email(email)
+                    // Le ponemos una contraseña aleatoria hiper-segura porque siempre entrará con Google
+                    .password(passwordEncoder.encode(UUID.randomUUID().toString()))
+                    .role("EMPLOYEE")
+                    .isActive(true)
+                    .company(assignedCompany)
+                    .profilePictureUrl(picture) // Guardamos su foto
+                    .build();
+
+            user = userRepository.save(user);
+            System.out.println("✅ Nuevo usuario registrado vía Google: " + email);
+        }
+
+        // 4. Google ya hizo su trabajo, ahora nosotros generamos NUESTRO propio JWT (El pase VIP)
+        String jwtToken = jwtService.generateToken(user.getEmail());
+
+        // 5. Devolvemos la respuesta al Frontend
+        return AuthResponse.builder()
+                .token(jwtToken)
+                .role(user.getRole())
+                .fullName(user.getFullName())
+                .userId(user.getId().toString())
+                .build();
     }
 }

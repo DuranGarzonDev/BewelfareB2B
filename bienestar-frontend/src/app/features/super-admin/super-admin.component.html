@@ -1,0 +1,143 @@
+<div *ngIf="showToast" class="fixed top-5 right-5 z-50 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-3 transition-opacity" [ngClass]="isError ? 'bg-red-600' : 'bg-green-500'">
+  <span class="font-bold">{{ toastMessage }}</span>
+</div>
+
+<div class="h-screen w-full bg-gray-50 flex flex-col md:flex-row overflow-hidden relative">
+  
+  <div class="md:hidden bg-red-700 text-white p-4 flex justify-between items-center shadow-md z-30 shrink-0">
+    <div class="font-black text-xl flex items-center gap-2"><span>BWelfare</span></div>
+    <button (click)="toggleMobileMenu()" class="p-2 hover:bg-red-800 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-red-300">
+      <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path *ngIf="!isMobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path><path *ngIf="isMobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+    </button>
+  </div>
+
+  <div *ngIf="isMobileMenuOpen" (click)="toggleMobileMenu()" class="absolute inset-0 bg-slate-900/60 z-40 md:hidden backdrop-blur-sm transition-opacity"></div>
+
+  <aside [ngClass]="isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'" class="absolute md:relative z-50 w-64 h-full bg-red-700 text-white flex flex-col shadow-2xl md:shadow-xl transform transition-transform duration-300 ease-in-out md:translate-x-0 shrink-0">
+    <div class="hidden md:flex p-6 font-black text-xl items-center gap-2 border-b border-red-600/50 shrink-0">
+      <span>BWelfare <span class="text-red-200 text-sm">UFPSO</span></span>
+    </div>
+
+    <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
+      <a routerLink="/dashboard" (click)="isMobileMenuOpen = false" class="block py-3 px-4 rounded-xl hover:bg-red-600 text-red-100 font-medium transition-colors">Inicio</a>
+      <a routerLink="/history" (click)="isMobileMenuOpen = false" class="block py-3 px-4 rounded-xl hover:bg-red-600 text-red-100 font-medium transition-colors">Mis Pausas Activas</a>
+      <a routerLink="/statistics" (click)="isMobileMenuOpen = false" class="block py-3 px-4 rounded-xl hover:bg-red-600 text-red-100 font-medium transition-colors">Estadísticas</a>
+      <a routerLink="/profile" (click)="isMobileMenuOpen = false" class="block py-3 px-4 rounded-xl hover:bg-red-600 text-red-100 font-medium transition-colors">Mi Perfil</a>
+      
+      <div class="pt-4 mt-4 border-t border-red-600/50">
+        <p class="px-4 text-xs font-bold text-red-300 uppercase tracking-wider mb-2">Control Global</p>
+        <a routerLink="/superadmin" (click)="isMobileMenuOpen = false" class="block py-3 px-4 rounded-xl bg-slate-900 text-white font-bold transition shadow-inner">Corporaciones</a>
+      </div>
+    </nav>
+
+    <div class="p-5 border-t border-red-600/50 flex flex-col items-center gap-6 shrink-0 bg-red-700">
+      <button (click)="logout()" class="w-full flex justify-center items-center gap-2 py-3 bg-slate-900 hover:bg-black rounded-xl text-white font-bold transition-colors shadow-md">
+        Cerrar Sesión
+      </button>
+      <img src="https://ufpso.edu.co/media/contenido/identidad/log_horizontal_blanco.png" alt="Logo UFPSO" class="w-48 opacity-90 hover:opacity-100 transition-opacity duration-300 pb-2">
+    </div>
+  </aside>
+
+  <main class="flex-1 h-full overflow-y-auto p-4 md:p-8 bg-gray-50">
+    
+    <header class="flex flex-col md:flex-row md:justify-between md:items-center bg-white p-5 md:p-6 rounded-2xl shadow-sm mb-6 md:mb-8 border border-gray-100 gap-4">
+      <div>
+        <h1 class="text-2xl md:text-3xl font-black text-slate-900">Centro de Mando SaaS</h1>
+        <p class="text-gray-500 mt-1 font-medium text-sm md:text-base">Gestiona las corporaciones y los accesos globales del sistema.</p>
+      </div>
+      <div class="flex items-center gap-4">
+        <div class="text-right">
+          <p class="text-sm font-bold text-gray-900">{{ userName }}</p>
+          <p class="text-[10px] font-black text-white bg-slate-900 inline-block px-3 py-1 rounded-full mt-1 uppercase tracking-widest shadow-sm">
+            {{ role }}
+          </p>
+        </div>
+      </div>
+    </header>
+
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6 md:gap-8">
+      
+      <div class="xl:col-span-1 space-y-6">
+        <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100 h-fit">
+          <h2 class="text-lg md:text-xl font-black text-slate-900 mb-6 border-b border-gray-100 pb-4">Registrar Empresa</h2>
+          
+          <form (ngSubmit)="saveCompany()" class="space-y-5">
+            <div>
+              <label class="block text-sm font-bold text-gray-700 mb-2">Nombre de la Corporación</label>
+              <input type="text" [(ngModel)]="newCompany.name" name="compName" required class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl shadow-sm focus:bg-white focus:ring-2 focus:ring-slate-900 focus:border-slate-900 outline-none transition-all font-medium text-gray-800" placeholder="Ej. Ecopetrol S.A.">
+            </div>
+            <div>
+              <label class="block text-sm font-bold text-gray-700 mb-2">Dominio de Correo</label>
+              <input type="text" [(ngModel)]="newCompany.emailDomain" name="compDomain" required class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl shadow-sm focus:bg-white focus:ring-2 focus:ring-slate-900 focus:border-slate-900 outline-none transition-all font-medium text-gray-800" placeholder="Ej. ecopetrol.com.co">
+              <p class="text-[10px] text-gray-500 mt-1 font-semibold">Si un usuario se registra con este dominio, será asignado automáticamente.</p>
+            </div>
+            <button type="submit" class="w-full py-3 bg-slate-900 hover:bg-black text-white rounded-xl font-bold transition-colors shadow-md text-sm md:text-base">
+              Añadir Empresa
+            </button>
+          </form>
+        </div>
+
+        <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100 h-fit">
+          <h2 class="text-lg md:text-xl font-black text-slate-900 mb-4 border-b border-gray-100 pb-4">Empresas Activas</h2>
+          <div class="space-y-3">
+            <div *ngFor="let comp of companies" class="p-4 bg-gray-50 rounded-xl border border-gray-100 flex flex-col gap-1">
+              <span class="font-black text-slate-800 text-sm">{{ comp.name }}</span>
+              <span class="text-xs font-bold text-red-700">{{ comp.emailDomain }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="xl:col-span-2">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          <div class="p-6 md:p-8 border-b border-gray-100">
+            <h2 class="text-lg md:text-xl font-black text-slate-900">Directorio Global de Usuarios</h2>
+            <p class="text-sm text-gray-500 font-medium mt-1">Cambia los roles de acceso aquí. Ten cuidado a quién le das permisos de ADMIN.</p>
+          </div>
+          
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse min-w-[700px]">
+              <thead>
+                <tr class="bg-gray-50 border-b border-gray-100 text-[10px] uppercase tracking-widest text-gray-500 font-bold">
+                  <th class="p-4 md:p-6">Usuario</th>
+                  <th class="p-4 md:p-6">Empresa</th>
+                  <th class="p-4 md:p-6">Rol Actual</th>
+                  <th class="p-4 md:p-6 text-right">Acciones</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-100">
+                <tr *ngFor="let user of users" class="hover:bg-gray-50/50 transition-colors">
+                  <td class="p-4 md:p-6">
+                    <p class="font-bold text-slate-900 text-sm md:text-base">{{ user.fullName }}</p>
+                    <p class="text-xs text-gray-500 font-medium">{{ user.email }}</p>
+                  </td>
+                  <td class="p-4 md:p-6">
+                    <span *ngIf="user.company" class="text-xs font-bold text-slate-700 bg-slate-100 px-2 py-1 rounded-md">{{ user.company.name }}</span>
+                    <span *ngIf="!user.company" class="text-xs font-bold text-red-500 bg-red-50 px-2 py-1 rounded-md">Sin Afiliación</span>
+                  </td>
+                  <td class="p-4 md:p-6">
+                    <span [ngClass]="{
+                      'bg-slate-900 text-white': user.role === 'SUPERADMIN',
+                      'bg-red-100 text-red-700 border border-red-200': user.role === 'ADMIN',
+                      'bg-blue-50 text-blue-700 border border-blue-100': user.role === 'EMPLOYEE'
+                    }" class="text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-wider">
+                      {{ user.role }}
+                    </span>
+                  </td>
+                  <td class="p-4 md:p-6 text-right">
+                    <select *ngIf="user.role !== 'SUPERADMIN'" #roleSelect (change)="updateRole(user.id, roleSelect.value)" class="text-xs font-bold bg-white border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-red-500 cursor-pointer text-slate-700 shadow-sm">
+                      <option value="" disabled selected>Cambiar Rol</option>
+                      <option value="EMPLOYEE">Hacer Empleado</option>
+                      <option value="ADMIN">Hacer Admin de Empresa</option>
+                    </select>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
