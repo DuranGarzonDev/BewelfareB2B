@@ -1,14 +1,13 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
-import { FormsModule } from '@angular/forms'; // <-- IMPORTANTE PARA LOS FORMULARIOS
+import { FormsModule } from '@angular/forms'; 
 import { BreakService } from '../../core/services/break.service';
-
 
 @Component({
   selector: 'app-admin-panel',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule], // <-- AGREGAR AQUÍ
+  imports: [CommonModule, RouterModule, FormsModule], 
   templateUrl: './admin-panel.component.html'
 })
 export class AdminPanelComponent implements OnInit {
@@ -16,12 +15,13 @@ export class AdminPanelComponent implements OnInit {
   role: string | null = '';
   categories: any[] = [];
   
-  // Variables para los mensajes de éxito/error
+  // 👇 NUEVO: Variable para atrapar el ID
+  myUserId: string = '';
+
   toastMessage = '';
   showToast = false;
   isError = false;
 
-  // Modelos para los formularios
   newCategory = { name: '', description: '' };
   newBreak = { title: '', description: '', durationSeconds: 60, mediaUrl: '', categoryId: null };
   isMobileMenuOpen: boolean = false;
@@ -35,8 +35,9 @@ export class AdminPanelComponent implements OnInit {
   ngOnInit() {
     this.userName = localStorage.getItem('fullName');
     this.role = localStorage.getItem('role');
+    // 👇 NUEVO: Lo atrapamos de la billetera (localStorage)
+    this.myUserId = localStorage.getItem('userId') || '';
 
-    // PROTECCIÓN DE RUTA: Si no es ADMIN, lo pateamos al Dashboard
     if (this.role !== 'ADMIN') {
       this.router.navigate(['/dashboard']);
       return;
@@ -65,17 +66,16 @@ export class AdminPanelComponent implements OnInit {
     this.breakService.createCategory(this.newCategory).subscribe({
       next: () => {
         this.showNotification('Categoría creada con éxito', false);
-        this.newCategory = { name: '', description: '' }; // Limpiar formulario
-        this.loadCategories(); // Recargar la lista
+        this.newCategory = { name: '', description: '' }; 
+        this.loadCategories(); 
       },
       error: () => this.showNotification('Error al crear la categoría', true)
     });
   }
 
-saveBreak() {
+  saveBreak() {
     if (!this.newBreak.title || !this.newBreak.categoryId) return;
 
-    // 1. Armamos el JSON SOLO con los datos de la pausa (como lo hacías en Postman)
     const payload = {
       title: this.newBreak.title,
       description: this.newBreak.description,
@@ -83,11 +83,10 @@ saveBreak() {
       mediaUrl: this.newBreak.mediaUrl
     };
 
-    // 2. Separamos el ID de la categoría para mandarlo por la URL
     const categoryId = Number(this.newBreak.categoryId);
 
-    // 3. Llamamos al servicio con ambos datos
-    this.breakService.createBreak(payload, categoryId).subscribe({
+    // 👇 ACTUALIZADO: Le pasamos el this.myUserId al final
+    this.breakService.createBreak(payload, categoryId, this.myUserId).subscribe({
       next: () => {
         this.showNotification('Pausa Activa guardada correctamente', false);
         this.newBreak = { title: '', description: '', durationSeconds: 60, mediaUrl: '', categoryId: null };

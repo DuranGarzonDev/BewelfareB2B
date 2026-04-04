@@ -33,4 +33,11 @@ public class ActiveBreak {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
+
+    // 👇 NUEVA RELACIÓN MULTI-TENANT 👇
+    // Si company es NULL, la pausa es GLOBAL (la ven todos).
+    // Si company tiene un ID, la pausa es PRIVADA (solo la ve esa empresa).
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "company_id")
+    private TuskSyS.bienestar_api.modules.companies.entities.Company company;
 }

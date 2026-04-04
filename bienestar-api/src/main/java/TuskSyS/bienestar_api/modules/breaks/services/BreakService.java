@@ -33,15 +33,37 @@ public class BreakService {
         return categoryRepository.save(category);
     }
 
-    public List<ActiveBreak> getAllBreaks() {
-        return activeBreakRepository.findAll();
+    // ==========================================
+    // 1. OBTENER PAUSAS FILTRADAS POR EMPRESA
+    // ==========================================
+    public List<ActiveBreak> getAvailableBreaks(UUID userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        if (user.getCompany() != null) {
+            // Si tiene empresa, trae las globales + las de su empresa
+            return activeBreakRepository.findGlobalAndByCompany(user.getCompany().getId());
+        }
+        
+        // Si es un usuario sin empresa, solo ve las globales
+        return activeBreakRepository.findByCompanyIsNull();
     }
 
-    public ActiveBreak createBreak(ActiveBreak activeBreak, Long categoryId) {
+    // ==========================================
+    // 2. CREAR PAUSA ASIGNADA A LA EMPRESA
+    // ==========================================
+    public ActiveBreak createBreak(ActiveBreak activeBreak, Long categoryId, UUID creatorId) {
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new RuntimeException("Categoría no encontrada"));
         
+        User creator = userRepository.findById(creatorId)
+                .orElseThrow(() -> new RuntimeException("Creador no encontrado"));
+
         activeBreak.setCategory(category);
+        
+        // ¡LA MAGIA AQUÍ! La pausa hereda la empresa de quien la creó
+        activeBreak.setCompany(creator.getCompany()); 
+
         return activeBreakRepository.save(activeBreak);
     }
 
@@ -61,18 +83,14 @@ public class BreakService {
         return userBreakRepository.save(record);
     }
 
-    // 3. Cambiamos Long por UUID aquí también
     public long getCompletedBreaksCount(UUID userId) {
         return userBreakRepository.countByUserId(userId);
     }
 
-    // === NUEVO MÉTODO: CALCULAR LA RACHA DE DÍAS CONSECUTIVOS ===
     public long calculateStreak(UUID userId) {
-        // 1. Traemos todo el historial de pausas del usuario
         List<UserBreak> breaks = userBreakRepository.findByUserIdOrderByCompletedAtDesc(userId);
         if (breaks.isEmpty()) return 0;
 
-        // 2. Extraemos solo las fechas (sin la hora) y quitamos los días repetidos
         List<java.time.LocalDate> uniqueDates = breaks.stream()
                 .map(b -> b.getCompletedAt().toLocalDate())
                 .distinct()
@@ -82,34 +100,29 @@ public class BreakService {
         java.time.LocalDate today = java.time.LocalDate.now();
         java.time.LocalDate targetDate = today;
 
-        // 3. Verificamos si la racha sigue viva (hizo pausa hoy o ayer)
         if (!uniqueDates.contains(today)) {
             if (uniqueDates.contains(today.minusDays(1))) {
-                targetDate = today.minusDays(1); // La racha está viva, empezamos a contar desde ayer
+                targetDate = today.minusDays(1); 
             } else {
-                return 0; // Perdió la racha, pasaron más de 24 horas
+                return 0; 
             }
         }
 
-        // 4. Contamos los días hacia atrás
         for (java.time.LocalDate date : uniqueDates) {
             if (date.equals(targetDate)) {
                 streak++;
-                targetDate = targetDate.minusDays(1); // Buscamos el día anterior
+                targetDate = targetDate.minusDays(1); 
             } else if (date.isBefore(targetDate)) {
-                break; // Se rompió la secuencia
+                break; 
             }
         }
         
         return streak;
     }
 
-    // === NUEVO MÉTODO: OBTENER HISTORIAL DETALLADO ===
     public List<BreakHistoryResponse> getUserHistory(UUID userId) {
-        // 1. Buscamos todas las pausas del usuario ordenadas desde la más reciente
         List<UserBreak> history = userBreakRepository.findByUserIdOrderByCompletedAtDesc(userId);
 
-        // 2. Traducimos cada "UserBreak" (Base de Datos) a un "BreakHistoryResponse" (Frontend)
         return history.stream().map(record -> BreakHistoryResponse.builder()
                 .id(record.getId())
                 .title(record.getActiveBreak().getTitle())

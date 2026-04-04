@@ -2,7 +2,7 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { trigger, style, animate, transition } from '@angular/animations';
-import { UserService } from '../../core/services/user.service'; // 👇 Importar
+import { UserService } from '../../core/services/user.service'; 
 import { BreakService } from '../../core/services/break.service'; 
 
 @Component({
@@ -28,12 +28,10 @@ export class DashboardComponent implements OnInit {
   showToast = false;
   toastMessage = '';
   
-
   activeBreaks: any[] = []; 
   completedBreaksCount: number = 0;
   currentStreak: number = 0;
   
-  // 👇 INICIA VACÍO
   myUserId: string = ''; 
 
   // === VARIABLES DEL MODAL Y RELOJ ===
@@ -55,8 +53,6 @@ export class DashboardComponent implements OnInit {
   ngOnInit() {
     this.userName = localStorage.getItem('fullName');
     this.role = localStorage.getItem('role');
-    
-    // 👇 LO ATRAPAMOS DINÁMICAMENTE AQUÍ
     this.myUserId = localStorage.getItem('userId') || ''; 
 
     if (!localStorage.getItem('token')) {
@@ -75,7 +71,7 @@ export class DashboardComponent implements OnInit {
       this.userService.getProfile(this.myUserId).subscribe({
         next: (data) => {
           this.profilePic = data.profilePictureUrl;
-          this.cdr.detectChanges(); // Actualizar la vista
+          this.cdr.detectChanges(); 
         }
       });
     }
@@ -86,14 +82,16 @@ export class DashboardComponent implements OnInit {
   }
 
   loadBreaks() {
-    this.breakService.getAllBreaks().subscribe({
+    // 👇 ACTUALIZADO: Le pasamos el ID del usuario al servicio
+    if (!this.myUserId) return;
+    
+    this.breakService.getAllBreaks(this.myUserId).subscribe({
       next: (data: any[]) => this.activeBreaks = data,
       error: (err: any) => console.error('Error cargando pausas:', err)
     });
   }
 
   loadStats() {
-    // Pequeña validación de seguridad
     if (!this.myUserId) return; 
 
     this.breakService.getUserStats(this.myUserId).subscribe({
@@ -110,7 +108,6 @@ export class DashboardComponent implements OnInit {
     this.router.navigate(['/login']); 
   }
 
-  // === LÓGICA DEL TEMPORIZADOR ===
   openModal(breakItem: any) {
     this.currentBreak = breakItem;
     this.timeLeft = breakItem.durationSeconds; 

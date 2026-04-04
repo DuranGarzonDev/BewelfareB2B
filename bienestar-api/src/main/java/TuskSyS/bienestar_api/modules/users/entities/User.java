@@ -40,6 +40,11 @@ public class User implements UserDetails { // <-- ¡Nuevo contrato de seguridad!
     @Builder.Default
     private boolean isActive = true; 
 
+    // 👇 NUEVA RELACIÓN MULTI-TENANT 👇
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "company_id")
+    private TuskSyS.bienestar_api.modules.companies.entities.Company company;
+
     // ==========================================================
     // MÉTODOS OBLIGATORIOS DE SPRING SECURITY (USER DETAILS)
     // ==========================================================
@@ -81,4 +86,6 @@ public class User implements UserDetails { // <-- ¡Nuevo contrato de seguridad!
 
     @Column(length = 1000)
     private String profilePictureUrl;
+
+    
 }

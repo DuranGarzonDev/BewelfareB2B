@@ -30,16 +30,20 @@ public class BreakController {
     }
 
     // === RUTAS PARA PAUSAS ACTIVAS ===
-    @GetMapping
-    public ResponseEntity<List<ActiveBreak>> getAllBreaks() {
-        return ResponseEntity.ok(breakService.getAllBreaks());
+    
+    // 1. OBTENER PAUSAS (AHORA FILTRADAS POR EMPRESA MEDIANTE userId)
+    @GetMapping("/{userId}")
+    public ResponseEntity<List<ActiveBreak>> getAvailableBreaks(@PathVariable UUID userId) {
+        return ResponseEntity.ok(breakService.getAvailableBreaks(userId));
     }
 
-    @PostMapping
+    // 2. CREAR PAUSA (AHORA REQUIERE EL creatorId PARA SABER A QUÉ EMPRESA ASIGNARLA)
+    @PostMapping("/{creatorId}")
     public ResponseEntity<ActiveBreak> createBreak(
+            @PathVariable UUID creatorId,
             @RequestBody ActiveBreak activeBreak, 
             @RequestParam Long categoryId) {
-        return ResponseEntity.ok(breakService.createBreak(activeBreak, categoryId));
+        return ResponseEntity.ok(breakService.createBreak(activeBreak, categoryId, creatorId));
     }
 
     @PostMapping("/{breakId}/complete/{userId}")
@@ -51,20 +55,17 @@ public class BreakController {
         }
     }
 
-    // 3. Cambiamos Long por UUID aquí
     @GetMapping("/stats/{userId}")
     public ResponseEntity<?> getUserStats(@PathVariable UUID userId) {
         long totalBreaks = breakService.getCompletedBreaksCount(userId);
-        long streak = breakService.calculateStreak(userId); // Llamamos a nuestro nuevo método
+        long streak = breakService.calculateStreak(userId); 
         
-        // Enviamos ambas variables al frontend
         return ResponseEntity.ok().body(java.util.Map.of(
             "pausasCompletadas", totalBreaks,
             "rachaDias", streak 
         ));
     }
 
-    // === RUTA ESPÍA PARA VER LOS UUID DE LOS USUARIOS ===
     @org.springframework.beans.factory.annotation.Autowired
     private TuskSyS.bienestar_api.modules.users.repositories.UserRepository userRepository;
 
@@ -73,11 +74,6 @@ public class BreakController {
         return ResponseEntity.ok(userRepository.findAll());
     }
     
-    // Importa el DTO arriba si no lo tienes: 
-    // import TuskSyS.bienestar_api.modules.breaks.dtos.BreakHistoryResponse;
-
-    // === RUTA PARA PEDIR EL HISTORIAL ===
-    // Ejemplo: GET /api/breaks/history/{userId}
     @GetMapping("/history/{userId}")
     public ResponseEntity<List<BreakHistoryResponse>> getUserHistory(@PathVariable UUID userId) {
         return ResponseEntity.ok(breakService.getUserHistory(userId));
