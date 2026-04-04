@@ -34,4 +34,11 @@ export class UserService {
   getLeaderboard(userId: string): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/leaderboard/${userId}`, { headers: this.getHeaders() });
   }
+
+  // ==========================================
+  // 🔔 ESTADO INTELIGENTE DE LA RACHA
+  // ==========================================
+  getStreakStatus(userId: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/${userId}/streak-status`, { headers: this.getHeaders() });
+  }
 }

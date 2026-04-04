@@ -57,7 +57,7 @@
 
   <main class="flex-1 h-full overflow-y-auto p-4 md:p-8 bg-gray-50">
     
-    <header class="flex flex-col md:flex-row md:justify-between md:items-center bg-white p-5 md:p-6 rounded-2xl shadow-sm mb-6 md:mb-8 border border-gray-100 gap-4">
+    <header class="flex flex-col md:flex-row md:justify-between md:items-center bg-white p-5 md:p-6 rounded-2xl shadow-sm mb-4 border border-gray-100 gap-4">
       <div>
         <h1 class="text-2xl md:text-3xl font-black text-slate-900">Panel de Control</h1>
         <p class="text-gray-500 mt-1 font-medium text-sm md:text-base">¡Qué bueno verte de nuevo por aquí!</p>
@@ -77,108 +77,134 @@
       </div>
     </header>
 
-    <div class="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
-      <div class="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-        <h3 class="text-xs md:text-sm font-bold text-gray-400 mb-1 uppercase tracking-wider">Pausas <span class="hidden sm:inline">Completadas</span></h3>
-        <p class="text-3xl md:text-4xl font-black text-slate-800">{{ completedBreaksCount }}</p>
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 mb-8 mt-6">
+      <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+        <h3 class="text-xs font-bold text-gray-400 mb-1 uppercase tracking-wider">Pausas <span class="hidden sm:inline">Completadas</span></h3>
+        <p class="text-2xl md:text-3xl font-black text-slate-800">{{ completedBreaksCount }}</p>
       </div>
-      <div class="bg-white p-4 md:p-6 rounded-2xl shadow-sm border-l-4 border-green-500 hover:shadow-md transition-shadow">
-        <h3 class="text-gray-400 text-xs md:text-sm font-bold uppercase tracking-wider flex items-center gap-1"><span class="text-green-500">🔥</span> Racha Actual</h3>
-        <p class="text-3xl md:text-4xl font-black text-slate-800">{{ currentStreak }} <span class="text-xs md:text-sm font-medium text-gray-500 ml-1">Días</span></p>
+
+      <div class="bg-white p-4 rounded-2xl shadow-sm border-l-4 transition-all duration-500 hover:shadow-md relative overflow-hidden"
+           [ngClass]="{
+             'border-green-500 bg-green-50/20': streakStatus?.type === 'SUCCESS',
+             'border-gray-300 bg-gray-50/50': streakStatus?.type === 'INFO',
+             'border-orange-500 bg-orange-50/30': streakStatus?.type === 'WARNING'
+           }">
+        
+        <h3 class="text-gray-400 text-xs font-bold uppercase tracking-wider flex items-center gap-1">
+          <span *ngIf="streakStatus?.type === 'SUCCESS'" class="text-green-500 animate-pulse">🔥</span>
+          <span *ngIf="streakStatus?.type === 'INFO'" class="text-gray-300 grayscale">🔥</span>
+          <span *ngIf="streakStatus?.type === 'WARNING'" class="text-orange-500">⏳</span>
+          Racha
+        </h3>
+        
+        <p class="text-2xl md:text-3xl font-black transition-colors duration-500"
+           [ngClass]="{
+             'text-green-600': streakStatus?.type === 'SUCCESS',
+             'text-slate-800': streakStatus?.type === 'INFO' || !streakStatus,
+             'text-orange-600': streakStatus?.type === 'WARNING'
+           }">
+           {{ currentStreak }} <span class="text-xs font-medium text-gray-500 ml-1">Días</span>
+        </p>
+
+        <span class="absolute top-2 right-2 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider hidden sm:block"
+              [ngClass]="{
+                'bg-green-100 text-green-700 border border-green-200': streakStatus?.type === 'SUCCESS',
+                'bg-gray-100 text-gray-500 border border-gray-200': streakStatus?.type === 'INFO',
+                'bg-orange-100 text-orange-700 border border-orange-200': streakStatus?.type === 'WARNING'
+              }">
+          {{ streakStatus?.type === 'SUCCESS' ? 'Activa' : (streakStatus?.type === 'WARNING' ? 'En Peligro' : 'Inactiva') }}
+        </span>
       </div>
-      <div class="bg-white p-4 md:p-6 rounded-2xl shadow-sm border-l-4 border-yellow-500 hover:shadow-md transition-shadow col-span-2 md:col-span-1">
-        <h3 class="text-gray-400 text-xs md:text-sm font-bold uppercase tracking-wider flex items-center gap-1"><span class="text-yellow-500">🪙</span> Billetera</h3>
-        <p class="text-3xl md:text-4xl font-black text-slate-800">{{ coins }} <span class="text-xs md:text-sm font-medium text-gray-500 ml-1">Coins</span></p>
+
+      <div class="bg-white p-4 rounded-2xl shadow-sm border-l-4 border-yellow-500 hover:shadow-md transition-shadow col-span-2 md:col-span-1 relative overflow-hidden">
+        <h3 class="text-gray-400 text-xs font-bold uppercase tracking-wider flex items-center gap-1"><span class="text-yellow-500">🪙</span> Billetera</h3>
+        <p class="text-2xl md:text-3xl font-black text-slate-800">{{ coins }} <span class="text-xs font-medium text-gray-500 ml-1">Coins</span></p>
       </div>
     </div>
     
-    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6 md:gap-8 mt-8 md:mt-12">
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6 md:gap-8 mt-4">
       
       <div class="xl:col-span-2">
-        <div class="flex justify-between items-center mb-6">
-          <h2 class="text-xl md:text-2xl font-black text-slate-900">Pausas Recomendadas</h2>
-          <button class="text-red-700 hover:text-red-800 font-bold text-sm transition-colors flex items-center gap-1">
-            Ver todas <svg class="w-4 h-4 hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-lg md:text-xl font-black text-slate-900">Pausas Recomendadas</h2>
+          <button class="text-red-700 hover:text-red-800 font-bold text-xs transition-colors flex items-center gap-1">
+            Ver todas <svg class="w-3 h-3 hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
           </button>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 md:gap-6">
-          <div *ngFor="let breakItem of activeBreaks" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300 flex flex-col transform hover:-translate-y-1">
-            <div class="h-32 md:h-40 bg-red-50 flex justify-center items-center overflow-hidden border-b border-red-100/50 relative">
-              <div class="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full shadow-sm flex items-center gap-1 border border-yellow-200">
-                <span class="text-yellow-500 text-sm">🪙</span>
-                <span class="font-black text-slate-800 text-xs">+{{ breakItem.coinReward || 10 }}</span>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div *ngFor="let breakItem of activeBreaks" class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all duration-300 flex flex-col transform hover:-translate-y-1">
+            <div class="h-24 bg-red-50 flex justify-center items-center overflow-hidden border-b border-red-100/50 relative">
+              <div class="absolute top-2 right-2 bg-white/90 backdrop-blur-sm px-2 py-0.5 rounded-full shadow-sm flex items-center gap-1 border border-yellow-200">
+                <span class="text-yellow-500 text-xs">🪙</span>
+                <span class="font-black text-slate-800 text-[10px]">+{{ breakItem.coinReward || 10 }}</span>
               </div>
-              <img [src]="breakItem.mediaUrl || 'https://cdn-icons-png.flaticon.com/512/3305/3305803.png'" alt="Imagen de pausa" class="h-20 md:h-24 object-contain drop-shadow-sm transition-transform hover:scale-110 duration-500">
+              <img [src]="breakItem.mediaUrl || 'https://cdn-icons-png.flaticon.com/512/3305/3305803.png'" alt="Imagen" class="h-16 object-contain drop-shadow-sm transition-transform hover:scale-110 duration-500">
             </div>
             
-            <div class="p-5 md:p-6 flex-1 flex flex-col">
-              <div class="flex justify-between items-start mb-3">
-                <span class="bg-red-100 text-red-700 text-[10px] md:text-xs font-bold px-2 md:px-3 py-1 rounded-full uppercase tracking-wide border border-red-200 truncate max-w-[60%]">
+            <div class="p-4 flex-1 flex flex-col">
+              <div class="flex justify-between items-center mb-2">
+                <span class="bg-red-100 text-red-700 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wide border border-red-200 truncate max-w-[60%]">
                   {{ breakItem.category?.name || 'General' }}
                 </span>
-                <span class="flex items-center text-gray-500 text-xs md:text-sm font-bold shrink-0">
-                  <svg class="w-3.5 h-3.5 md:w-4 md:h-4 mr-1 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span class="flex items-center text-gray-500 text-[10px] font-bold shrink-0">
+                  <svg class="w-3 h-3 mr-0.5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                   {{ breakItem.durationSeconds }}s
                 </span>
               </div>
               
-              <h3 class="text-lg md:text-xl font-black text-slate-900 mb-2 leading-tight">{{ breakItem.title }}</h3>
-              <p class="text-gray-600 text-xs md:text-sm flex-1 line-clamp-2 md:line-clamp-3 font-medium">{{ breakItem.description }}</p>
+              <h3 class="text-sm font-black text-slate-900 mb-1 leading-tight line-clamp-1">{{ breakItem.title }}</h3>
+              <p class="text-gray-500 text-[11px] flex-1 line-clamp-2 font-medium leading-snug">{{ breakItem.description }}</p>
               
-              <button (click)="openModal(breakItem)" class="mt-4 md:mt-6 w-full py-2.5 md:py-3 bg-red-50 hover:bg-red-700 text-red-700 hover:text-white rounded-xl font-bold transition-colors duration-300 border border-red-100 hover:border-red-700 text-sm md:text-base">
+              <button (click)="openModal(breakItem)" class="mt-3 w-full py-2 bg-red-50 hover:bg-red-700 text-red-700 hover:text-white rounded-lg font-bold transition-colors duration-300 border border-red-100 hover:border-red-700 text-xs">
                 Iniciar Pausa
               </button>
             </div>
           </div>
 
-          <div *ngIf="activeBreaks.length === 0" class="col-span-full bg-white rounded-2xl p-6 md:p-10 text-center border-2 border-dashed border-gray-200">
-            <div class="w-12 h-12 md:w-16 md:h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
-              <svg class="h-6 w-6 md:h-8 md:w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2-2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-            </div>
-            <h3 class="text-lg md:text-xl font-black text-slate-900">No hay pausas disponibles</h3>
-            <p class="text-gray-500 mt-1 md:mt-2 font-medium text-sm md:text-base">Aún no se han creado pausas activas en la base de datos.</p>
+          <div *ngIf="activeBreaks.length === 0" class="col-span-full bg-white rounded-xl p-6 text-center border-2 border-dashed border-gray-200">
+            <h3 class="text-sm font-black text-slate-900">No hay pausas disponibles</h3>
           </div>
         </div>
       </div>
 
       <div class="xl:col-span-1">
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden sticky top-6">
-          <div class="p-6 bg-slate-900 text-white border-b border-gray-100 flex items-center justify-between">
-            <h2 class="text-lg md:text-xl font-black flex items-center gap-2">
-              <span class="text-yellow-400 text-2xl">🏆</span> Salón de la Fama
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden sticky top-6">
+          <div class="p-4 bg-slate-900 text-white border-b border-gray-100 flex items-center justify-between">
+            <h2 class="text-base font-black flex items-center gap-2">
+              <span class="text-yellow-400 text-xl">🏆</span> Salón de la Fama
             </h2>
           </div>
           
           <div class="p-0">
             <div *ngFor="let user of leaderboard; let i = index" 
-                 class="flex items-center gap-4 p-4 border-b border-gray-50 hover:bg-gray-50 transition-colors"
+                 class="flex items-center gap-3 p-3 border-b border-gray-50 hover:bg-gray-50 transition-colors"
                  [ngClass]="{'bg-yellow-50/30': i === 0, 'bg-gray-50/50': i === 1, 'bg-orange-50/30': i === 2}">
               
-              <div class="w-8 flex justify-center shrink-0">
-                <span *ngIf="i === 0" class="text-2xl drop-shadow-sm">🥇</span>
-                <span *ngIf="i === 1" class="text-2xl drop-shadow-sm">🥈</span>
-                <span *ngIf="i === 2" class="text-2xl drop-shadow-sm">🥉</span>
-                <span *ngIf="i > 2" class="text-gray-400 font-black text-lg">{{ i + 1 }}</span>
+              <div class="w-6 flex justify-center shrink-0">
+                <span *ngIf="i === 0" class="text-xl drop-shadow-sm">🥇</span>
+                <span *ngIf="i === 1" class="text-xl drop-shadow-sm">🥈</span>
+                <span *ngIf="i === 2" class="text-xl drop-shadow-sm">🥉</span>
+                <span *ngIf="i > 2" class="text-gray-400 font-black text-sm">{{ i + 1 }}</span>
               </div>
               
-              <div class="h-10 w-10 rounded-full bg-slate-100 border-2 border-white shadow-sm flex justify-center items-center text-slate-800 font-bold uppercase overflow-hidden shrink-0">
+              <div class="h-8 w-8 rounded-full bg-slate-100 border border-white shadow-sm flex justify-center items-center text-slate-800 font-bold uppercase overflow-hidden shrink-0 text-xs">
                 <img *ngIf="user.profilePictureUrl" [src]="user.profilePictureUrl" alt="Avatar" class="w-full h-full object-cover">
                 <span *ngIf="!user.profilePictureUrl">{{ user.fullName ? user.fullName.charAt(0) : 'U' }}</span>
               </div>
               
               <div class="flex-1 min-w-0">
-                <p class="text-sm font-bold text-slate-900 truncate">{{ user.fullName }}</p>
-                <div class="flex items-center gap-3 mt-0.5">
-                  <span class="text-xs font-bold text-gray-500 flex items-center gap-1"><span class="text-yellow-500">🪙</span> {{ user.coins }}</span>
-                  <span class="text-xs font-bold text-gray-400 flex items-center gap-1"><span class="text-green-500">🔥</span> {{ user.currentStreak }} d</span>
+                <p class="text-xs font-bold text-slate-900 truncate">{{ user.fullName }}</p>
+                <div class="flex items-center gap-2 mt-0.5">
+                  <span class="text-[10px] font-bold text-gray-500 flex items-center gap-0.5"><span class="text-yellow-500">🪙</span>{{ user.coins }}</span>
+                  <span class="text-[10px] font-bold text-gray-400 flex items-center gap-0.5"><span class="text-green-500">🔥</span>{{ user.currentStreak }}d</span>
                 </div>
               </div>
 
             </div>
 
-            <div *ngIf="leaderboard.length === 0" class="p-8 text-center">
-              <p class="text-gray-500 text-sm font-medium">Aún no hay usuarios en la tabla. ¡Sé el primero!</p>
+            <div *ngIf="leaderboard.length === 0" class="p-6 text-center">
+              <p class="text-gray-500 text-xs font-medium">Aún no hay usuarios en la tabla. ¡Sé el primero!</p>
             </div>
           </div>
         </div>
@@ -190,29 +216,44 @@
 
 <div *ngIf="isModalOpen" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/70 backdrop-blur-sm transition-opacity p-4">
   <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-md p-6 md:p-10 relative flex flex-col items-center text-center transform transition-all border border-gray-100">
-    
     <button (click)="closeModal()" class="absolute top-4 right-4 md:top-5 md:right-5 text-gray-400 hover:text-red-600 transition-colors bg-gray-50 hover:bg-red-50 rounded-full p-2">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
     </button>
-
     <div class="h-24 w-24 md:h-28 md:w-28 bg-red-50 rounded-full flex items-center justify-center mb-5 md:mb-6 border-4 border-red-100 shadow-inner">
       <img [src]="currentBreak?.mediaUrl || 'https://cdn-icons-png.flaticon.com/512/3305/3305803.png'" alt="Pausa" class="h-12 md:h-16 object-contain">
     </div>
-    
     <h2 class="text-xl md:text-2xl font-black text-slate-900 mb-2 md:mb-3">{{ currentBreak?.title }}</h2>
     <p class="text-gray-500 mb-6 md:mb-8 leading-relaxed text-xs md:text-sm font-medium px-2">{{ currentBreak?.description }}</p>
-
     <div class="bg-red-700 text-white rounded-2xl w-full py-5 md:py-6 mb-5 md:mb-6 shadow-lg shadow-red-900/20 relative overflow-hidden">
       <div class="absolute -right-6 -top-6 w-24 h-24 bg-red-600 rounded-full opacity-50 blur-xl"></div>
-      
       <p class="text-xs md:text-sm text-red-200 font-bold tracking-widest uppercase mb-1 relative z-10">Tiempo Restante</p>
       <div class="text-5xl md:text-6xl font-black font-mono tracking-tight relative z-10">
         00:{{ timeLeft < 10 ? '0' + timeLeft : timeLeft }}
       </div>
     </div>
+    <button (click)="closeModal()" class="text-xs md:text-sm font-bold text-gray-400 hover:text-slate-800 transition-colors uppercase tracking-wider py-2">Cancelar</button>
+  </div>
+</div>
 
-    <button (click)="closeModal()" class="text-xs md:text-sm font-bold text-gray-400 hover:text-slate-800 transition-colors uppercase tracking-wider py-2">
-      Cancelar
+<div *ngIf="isStreakModalOpen" class="fixed inset-0 z-[110] flex items-center justify-center bg-slate-900/80 backdrop-blur-md transition-opacity p-4">
+  <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-sm p-8 relative flex flex-col items-center text-center transform transition-all border-4 border-green-400 animate-bounce-short">
+    
+    <div class="absolute top-0 w-full h-32 bg-gradient-to-b from-green-100 to-transparent rounded-t-[2rem] opacity-50"></div>
+
+    <div class="relative z-10 h-24 w-24 bg-green-100 rounded-full flex items-center justify-center mb-6 shadow-inner shadow-green-300">
+      <span class="text-5xl drop-shadow-md">🔥</span>
+    </div>
+    
+    <h2 class="text-2xl font-black text-green-600 mb-2">¡Racha Activada!</h2>
+    <p class="text-gray-600 font-medium text-sm mb-6">Has asegurado tu progreso de hoy. Tu racha actual es de <span class="font-black text-slate-800 text-base">{{ currentStreak }} días</span>.</p>
+    
+    <div class="flex items-center gap-2 mb-6 bg-yellow-50 px-4 py-2 rounded-full border border-yellow-200">
+      <span class="text-yellow-500">🪙</span>
+      <span class="font-bold text-slate-800 text-sm">+{{ currentBreak?.coinReward || 10 }} Coins añadidos</span>
+    </div>
+
+    <button (click)="closeStreakModal()" class="w-full py-3 bg-green-500 hover:bg-green-600 text-white rounded-xl font-bold transition-colors shadow-md text-sm">
+      ¡A seguir así!
     </button>
   </div>
 </div>

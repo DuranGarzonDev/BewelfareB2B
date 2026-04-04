@@ -29,22 +29,29 @@ export class DashboardComponent implements OnInit {
   toastMessage = '';
   
   activeBreaks: any[] = []; 
-  leaderboard: any[] = []; // 🏆 Nuestro Top 10
+  leaderboard: any[] = []; 
+  streakStatus: any = null; 
   
   completedBreaksCount: number = 0;
   currentStreak: number = 0;
-  coins: number = 0; // 🪙 Billetera del usuario
+  coins: number = 0; 
   
   myUserId: string = ''; 
 
-  // === VARIABLES DEL MODAL Y RELOJ ===
+  // === VARIABLES DE MODALES ===
   isModalOpen = false;
   currentBreak: any = null;
   timeLeft: number = 0;
   timerInterval: any;
 
+  isStreakModalOpen = false;
+  streakWasJustActivated = false;
+
   isMobileMenuOpen: boolean = false;
   profilePic: string | null = null;
+
+  // 👇 MOTOR DE AUDIO GLOBAL 👇
+  private audioCtx: any = null;
 
   constructor(
     private router: Router, 
@@ -78,6 +85,7 @@ export class DashboardComponent implements OnInit {
     this.loadStats();
     this.loadProfile();
     this.loadLeaderboard();
+    this.loadStreakStatus();
   }
 
   toggleMobileMenu() {
@@ -89,17 +97,33 @@ export class DashboardComponent implements OnInit {
     this.userService.getProfile(this.myUserId).subscribe({
       next: (data) => {
         this.profilePic = data.profilePictureUrl;
-        this.coins = data.coins || 0; // 🪙 Extraemos las monedas de la BD
-        this.currentStreak = data.currentStreak || 0; // 🔥 Extraemos la racha oficial
+        this.coins = data.coins || 0; 
+        this.currentStreak = data.currentStreak || 0; 
         this.cdr.detectChanges(); 
       }
     });
   }
 
+  loadStreakStatus() {
+    if (!this.myUserId) return;
+    this.userService.getStreakStatus(this.myUserId).subscribe({
+      next: (status) => {
+        const hadAlreadyBrokenToday = this.streakStatus?.type === 'SUCCESS';
+        this.streakStatus = status;
+        
+        if (!hadAlreadyBrokenToday && status.type === 'SUCCESS') {
+           this.streakWasJustActivated = true;
+        }
+
+        this.cdr.detectChanges();
+      },
+      error: (err) => console.error('Error cargando estado de racha:', err)
+    });
+  }
+
   loadLeaderboard() {
-    if (!this.myUserId) return; // Validación de seguridad
+    if (!this.myUserId) return; 
     
-    // 👇 Le pasamos el ID al servicio
     this.userService.getLeaderboard(this.myUserId).subscribe({
       next: (data) => {
         this.leaderboard = data;
@@ -122,7 +146,6 @@ export class DashboardComponent implements OnInit {
     this.breakService.getUserStats(this.myUserId).subscribe({
       next: (stats: any) => {
         this.completedBreaksCount = stats.pausasCompletadas;
-        // Ya no usamos la racha de aquí, usamos la del Profile que es más precisa
       },
       error: (err: any) => console.error('Error cargando estadísticas:', err)
     });
@@ -133,7 +156,19 @@ export class DashboardComponent implements OnInit {
     this.router.navigate(['/login']); 
   }
 
+  // 👇 INICIALIZAR AUDIO (Se llama con el clic del usuario)
+  initAudio() {
+    if (!this.audioCtx) {
+      this.audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+    }
+    // Si el navegador lo suspendió, lo despertamos
+    if (this.audioCtx.state === 'suspended') {
+      this.audioCtx.resume();
+    }
+  }
+
   openModal(breakItem: any) {
+    this.initAudio(); // 🔓 DESBLOQUEAMOS EL AUDIO CON EL CLIC
     this.currentBreak = breakItem;
     this.timeLeft = breakItem.durationSeconds; 
     this.isModalOpen = true;
@@ -148,6 +183,31 @@ export class DashboardComponent implements OnInit {
     }
   }
 
+  // 👇 REPRODUCIR SONIDO (Estilo Moneda / Campanita)
+  playSuccessSound() {
+    if (!this.audioCtx) return;
+
+    const oscillator = this.audioCtx.createOscillator();
+    const gainNode = this.audioCtx.createGain();
+
+    oscillator.connect(gainNode);
+    gainNode.connect(this.audioCtx.destination);
+
+    oscillator.type = 'sine';
+    
+    // Tono 1 y Tono 2 (Hace "Ti-Ding!")
+    oscillator.frequency.setValueAtTime(987.77, this.audioCtx.currentTime); // Nota B5
+    oscillator.frequency.setValueAtTime(1318.51, this.audioCtx.currentTime + 0.1); // Nota E6
+
+    // Volumen de campana (Sube rápido y baja suave)
+    gainNode.gain.setValueAtTime(0, this.audioCtx.currentTime);
+    gainNode.gain.linearRampToValueAtTime(0.5, this.audioCtx.currentTime + 0.05);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioCtx.currentTime + 0.5);
+
+    oscillator.start(this.audioCtx.currentTime);
+    oscillator.stop(this.audioCtx.currentTime + 0.6);
+  }
+
   startTimer() {
     this.timerInterval = setInterval(() => {
       if (this.timeLeft > 0) {
@@ -157,7 +217,7 @@ export class DashboardComponent implements OnInit {
         clearInterval(this.timerInterval);
         this.finishBreak();
       }
-    }, 700); 
+    }, 1000); // Lo cambié a 1000ms (1 segundo exacto) para que el reloj sea real.
   }
 
   finishBreak() {
@@ -166,17 +226,29 @@ export class DashboardComponent implements OnInit {
     this.breakService.completeBreak(this.currentBreak.id, this.myUserId).subscribe({
       next: () => {
         this.closeModal();
+        this.playSuccessSound(); // 🔔 ¡AHORA SÍ SUENA EL DING!
         
-        // RECARGAMOS TODO PARA VER LA MAGIA EN TIEMPO REAL 🚀
+        const wasFirstBreakOfDay = this.streakStatus?.type !== 'SUCCESS';
+
         this.loadStats(); 
         this.loadProfile(); 
         this.loadLeaderboard(); 
-        
-        this.toastMessage = `¡Excelente! +${this.currentBreak.coinReward || 10} Coins ganados.`;
-        this.showToast = true;
-        setTimeout(() => { this.showToast = false; this.cdr.detectChanges(); }, 3000);
+        this.loadStreakStatus(); 
+
+        if (wasFirstBreakOfDay) {
+          this.isStreakModalOpen = true;
+        } else {
+           this.toastMessage = `¡Excelente! +${this.currentBreak.coinReward || 10} Coins ganados.`;
+           this.showToast = true;
+           setTimeout(() => { this.showToast = false; this.cdr.detectChanges(); }, 3000);
+        }
       },
       error: (err) => console.error("Error guardando historial:", err)
     });
+  }
+
+  closeStreakModal() {
+    this.isStreakModalOpen = false;
+    this.streakWasJustActivated = false;
   }
 }
