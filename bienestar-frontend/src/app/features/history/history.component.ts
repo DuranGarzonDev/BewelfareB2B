@@ -2,6 +2,7 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core'; // 1. 👇
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router'; // 2. 👇 Importamos para navegación y menú
 import { BreakService } from '../../core/services/break.service';
+import { UserService } from '../../core/services/user.service'; // 👇 Importar
 
 @Component({
   selector: 'app-history',
@@ -19,11 +20,14 @@ export class HistoryComponent implements OnInit {
   role: string | null = '';
 
   isMobileMenuOpen: boolean = false;
+  profilePic: string | null = null;
+  
 
   constructor(
     private breakService: BreakService,
     private router: Router, // Para el logout
-    private cdr: ChangeDetectorRef // 5. 👇 Inyectamos el pellizco mágico
+    private cdr: ChangeDetectorRef, // 5. 👇 Inyectamos el pellizco mágico
+    private userService: UserService
   ) {}
 
   ngOnInit() {
@@ -36,6 +40,12 @@ export class HistoryComponent implements OnInit {
       this.router.navigate(['/login']);
     } else if (this.myUserId) {
       this.loadHistory();
+      this.userService.getProfile(this.myUserId).subscribe({
+        next: (data) => {
+          this.profilePic = data.profilePictureUrl;
+          this.cdr.detectChanges(); // Actualizar la vista
+        }
+      });
     } else {
       this.isLoading = false;
       this.cdr.detectChanges(); // Forzamos actualización visual

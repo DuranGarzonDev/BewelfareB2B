@@ -2,6 +2,7 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { BreakService } from '../../core/services/break.service';
+import { UserService } from '../../core/services/user.service'; // 👇 Importar
 
 @Component({
   selector: 'app-statistics',
@@ -23,12 +24,13 @@ export class StatisticsComponent implements OnInit {
   // Datos para nuestro gráfico de barras
   categoryStats: { name: string, count: number, percentage: number }[] = [];
   isMobileMenuOpen: boolean = false;
-
+  profilePic: string | null = null;
 
   constructor(
     private breakService: BreakService,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private userService: UserService
   ) {}
 
   ngOnInit() {
@@ -40,6 +42,12 @@ export class StatisticsComponent implements OnInit {
       this.router.navigate(['/login']);
     } else if (this.myUserId) {
       this.loadAndCalculateStats();
+      this.userService.getProfile(this.myUserId).subscribe({
+        next: (data) => {
+          this.profilePic = data.profilePictureUrl;
+          this.cdr.detectChanges(); // Actualizar la vista
+        }
+      });
     }
   }
 

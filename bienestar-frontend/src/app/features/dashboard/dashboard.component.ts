@@ -2,6 +2,7 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { trigger, style, animate, transition } from '@angular/animations';
+import { UserService } from '../../core/services/user.service'; // 👇 Importar
 import { BreakService } from '../../core/services/break.service'; 
 
 @Component({
@@ -42,11 +43,13 @@ export class DashboardComponent implements OnInit {
   timerInterval: any;
 
   isMobileMenuOpen: boolean = false;
+  profilePic: string | null = null;
 
   constructor(
     private router: Router, 
     private cdr: ChangeDetectorRef,
-    private breakService: BreakService 
+    private breakService: BreakService,
+    private userService: UserService
   ) {}
 
   ngOnInit() {
@@ -69,6 +72,12 @@ export class DashboardComponent implements OnInit {
 
       this.loadBreaks();
       this.loadStats();
+      this.userService.getProfile(this.myUserId).subscribe({
+        next: (data) => {
+          this.profilePic = data.profilePictureUrl;
+          this.cdr.detectChanges(); // Actualizar la vista
+        }
+      });
     }
   }
 

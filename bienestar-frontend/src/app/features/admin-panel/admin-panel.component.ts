@@ -4,6 +4,7 @@ import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms'; // <-- IMPORTANTE PARA LOS FORMULARIOS
 import { BreakService } from '../../core/services/break.service';
 
+
 @Component({
   selector: 'app-admin-panel',
   standalone: true,
