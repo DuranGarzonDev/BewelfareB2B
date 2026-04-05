@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AdminService } from '../../core/services/admin.service';
 import { BreakService } from '../../core/services/break.service';
-import { UserService } from '../../core/services/user.service'; // 👇 INYECTADO PARA LA FOTO
+import { UserService } from '../../core/services/user.service'; 
 
 @Component({
   selector: 'app-admin-panel',
@@ -16,7 +16,7 @@ export class AdminPanelComponent implements OnInit {
   userName: string | null = '';
   role: string | null = '';
   myUserId: string = '';
-  profilePic: string | null = null; // 👇 VARIABLE PARA LA FOTO
+  profilePic: string | null = null; 
   
   showToast = false;
   toastMessage = '';
@@ -33,7 +33,7 @@ export class AdminPanelComponent implements OnInit {
   categories: any[] = [];
   newCategory = { name: '', description: '' };
   newBreak = { title: '', description: '', durationSeconds: 60, mediaUrl: '', coinReward: 10, categoryId: null as number | null };
-  newInvite = { email: '' }; // Para la futura invitación
+  newInvite = { email: '' }; // Variable vinculada al modal de invitación
 
   isMobileMenuOpen: boolean = false;
 
@@ -46,7 +46,7 @@ export class AdminPanelComponent implements OnInit {
     private router: Router,
     private adminService: AdminService,
     private breakService: BreakService,
-    private userService: UserService, // 👇 INYECTADO AQUÍ
+    private userService: UserService, 
     private cdr: ChangeDetectorRef 
   ) {}
 
@@ -60,7 +60,7 @@ export class AdminPanelComponent implements OnInit {
       return;
     }
 
-    this.loadProfile(); // 👇 CARGAMOS LA FOTO AL INICIAR
+    this.loadProfile(); 
     this.loadStats();
     this.loadCategories();
   }
@@ -77,16 +77,15 @@ export class AdminPanelComponent implements OnInit {
   openInviteModal() { this.isInviteModalOpen = true; }
   closeInviteModal() { this.isInviteModalOpen = false; }
 
-  // 👇 LÓGICA DEL BOTÓN DE USUARIOS/EMPLEADOS
+  // LÓGICA DEL BOTÓN DE USUARIOS/EMPLEADOS
   manageUsers() {
     if (this.role === 'SUPERADMIN') {
-      this.router.navigate(['/superadmin']); // Te lleva a tu panel global
+      this.router.navigate(['/superadmin']); 
     } else {
       this.showNotification('Módulo de plantilla de empleados en construcción.', false);
     }
   }
 
-  // 👇 MÉTODO PARA CARGAR LA FOTO DEL USUARIO
   loadProfile() {
     if (!this.myUserId) return;
     this.userService.getProfile(this.myUserId).subscribe({
@@ -157,17 +156,33 @@ export class AdminPanelComponent implements OnInit {
     });
   }
 
+  // 👇 LÓGICA DE INVITACIÓN CONECTADA AL BACKEND 👇
   sendInvite() {
-    this.showNotification(`Invitación enviada a ${this.newInvite.email}`, false);
-    this.newInvite.email = '';
-    this.closeInviteModal();
+    if (!this.newInvite.email || this.newInvite.email.trim() === '') {
+      this.showNotification('Por favor ingresa un correo válido.', true);
+      return;
+    }
+
+    this.adminService.inviteUser(this.myUserId, this.newInvite.email).subscribe({
+      next: (res) => {
+        // res.message contiene el texto de éxito del backend
+        this.showNotification(res.message || `Invitación enviada a ${this.newInvite.email}`, false);
+        this.newInvite.email = '';
+        this.closeInviteModal();
+      },
+      error: (err) => {
+        // Mostramos el mensaje de error exacto que envía el Backend (ej: "Ya existe una invitación...")
+        const errorMsg = err.error?.error || 'Ocurrió un error al enviar la invitación.';
+        this.showNotification(errorMsg, true);
+      }
+    });
   }
 
   showNotification(message: string, isError: boolean) {
     this.toastMessage = message;
     this.isError = isError;
     this.showToast = true;
-    setTimeout(() => { this.showToast = false; }, 3000);
+    setTimeout(() => { this.showToast = false; this.cdr.detectChanges(); }, 3500);
   }
 
   logout() {

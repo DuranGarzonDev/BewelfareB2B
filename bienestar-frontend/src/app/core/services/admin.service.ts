@@ -23,4 +23,15 @@ export class AdminService {
   getCompanyStats(adminId: string): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/${adminId}/company-stats`, { headers: this.getHeaders() });
   }
+
+  // ==========================================
+  // 📩 ENVIAR INVITACIÓN A EMPLEADO
+  // ==========================================
+  inviteUser(adminId: string, email: string): Observable<any> {
+    return this.http.post<any>(
+      `${this.apiUrl}/${adminId}/invites`, 
+      { email: email }, 
+      { headers: this.getHeaders() }
+    );
+  }
 }

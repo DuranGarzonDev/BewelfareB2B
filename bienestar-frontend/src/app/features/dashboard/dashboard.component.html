@@ -66,9 +66,19 @@
       <div class="flex items-center gap-4 bg-gray-50 md:bg-transparent p-3 md:p-0 rounded-xl md:rounded-none border md:border-transparent border-gray-100">
         <div class="text-right">
           <p class="text-sm font-bold text-gray-900">{{ userName }}</p>
-          <p class="text-xs font-bold text-red-700 bg-red-50 inline-block px-2 py-1 rounded-full mt-1 border border-red-100">
-            {{ role === 'EMPLOYEE' ? 'Empleado' : role }}
+
+          <p *ngIf="role !== 'EMPLOYEE'" class="text-xs font-bold text-red-700 bg-red-50 inline-block px-2 py-1 rounded-full mt-1 border border-red-100">
+            {{ role }}
           </p>
+          
+          <p *ngIf="role === 'EMPLOYEE' && hasCompany" class="text-xs font-bold text-blue-700 bg-blue-50 inline-block px-2 py-1 rounded-full mt-1 border border-blue-100">
+            Empleado
+          </p>
+
+          <p *ngIf="role === 'EMPLOYEE' && !hasCompany" class="text-xs font-bold text-gray-500 bg-gray-100 inline-block px-2 py-1 rounded-full mt-1 border border-gray-200">
+            Usuario
+          </p>
+
         </div>
         <div class="h-10 w-10 md:h-12 md:w-12 rounded-full bg-red-100 border-2 border-red-200 flex justify-center items-center text-red-700 font-bold text-lg md:text-xl uppercase shadow-sm shrink-0 overflow-hidden">
           <img *ngIf="profilePic" [src]="profilePic" alt="Avatar" class="w-full h-full object-cover">
@@ -76,6 +86,34 @@
         </div>
       </div>
     </header>
+
+    <div *ngIf="streakStatus" class="mt-2 mb-6 rounded-2xl p-4 md:p-5 flex items-center gap-4 shadow-sm border transition-all"
+         [ngClass]="{
+           'bg-green-50 border-green-200 text-green-800': streakStatus.type === 'SUCCESS',
+           'bg-amber-50 border-amber-200 text-amber-800': streakStatus.type === 'WARNING',
+           'bg-blue-50 border-blue-200 text-blue-800': streakStatus.type === 'INFO'
+         }">
+      
+      <div class="h-10 w-10 rounded-full flex items-center justify-center shrink-0"
+           [ngClass]="{
+             'bg-green-100': streakStatus.type === 'SUCCESS',
+             'bg-amber-100': streakStatus.type === 'WARNING',
+             'bg-blue-100': streakStatus.type === 'INFO'
+           }">
+        <span *ngIf="streakStatus.type === 'SUCCESS'" class="text-xl">🛡️</span>
+        <span *ngIf="streakStatus.type === 'WARNING'" class="text-xl">⏳</span>
+        <span *ngIf="streakStatus.type === 'INFO'" class="text-xl">🚀</span>
+      </div>
+
+      <div class="flex-1">
+        <h3 class="font-black text-sm md:text-base leading-tight">
+          {{ streakStatus.message }}
+        </h3>
+        <p *ngIf="streakStatus.type === 'WARNING'" class="text-xs md:text-sm font-medium mt-0.5 opacity-80">
+          ¡No rompas tu progreso! Tómate unos segundos para ti.
+        </p>
+      </div>
+    </div>
 
     <div class="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 mb-8 mt-6">
       <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
@@ -237,23 +275,40 @@
 
 <div *ngIf="isStreakModalOpen" class="fixed inset-0 z-[110] flex items-center justify-center bg-slate-900/80 backdrop-blur-md transition-opacity p-4">
   <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-sm p-8 relative flex flex-col items-center text-center transform transition-all border-4 border-green-400 animate-bounce-short">
-    
     <div class="absolute top-0 w-full h-32 bg-gradient-to-b from-green-100 to-transparent rounded-t-[2rem] opacity-50"></div>
-
     <div class="relative z-10 h-24 w-24 bg-green-100 rounded-full flex items-center justify-center mb-6 shadow-inner shadow-green-300">
       <span class="text-5xl drop-shadow-md">🔥</span>
     </div>
-    
     <h2 class="text-2xl font-black text-green-600 mb-2">¡Racha Activada!</h2>
     <p class="text-gray-600 font-medium text-sm mb-6">Has asegurado tu progreso de hoy. Tu racha actual es de <span class="font-black text-slate-800 text-base">{{ currentStreak }} días</span>.</p>
-    
     <div class="flex items-center gap-2 mb-6 bg-yellow-50 px-4 py-2 rounded-full border border-yellow-200">
       <span class="text-yellow-500">🪙</span>
       <span class="font-bold text-slate-800 text-sm">+{{ currentBreak?.coinReward || 10 }} Coins añadidos</span>
     </div>
-
     <button (click)="closeStreakModal()" class="w-full py-3 bg-green-500 hover:bg-green-600 text-white rounded-xl font-bold transition-colors shadow-md text-sm">
       ¡A seguir así!
     </button>
+  </div>
+</div>
+
+<div *ngIf="isInvitationModalOpen && pendingInvitations.length > 0" class="fixed inset-0 z-[120] flex items-center justify-center bg-slate-900/80 backdrop-blur-md transition-opacity p-4">
+  <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-sm p-8 relative flex flex-col items-center text-center transform transition-all border-4 border-purple-400">
+    <div class="relative z-10 h-20 w-20 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mb-6 shadow-inner">
+      <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+    </div>
+    
+    <h2 class="text-2xl font-black text-slate-900 mb-2">¡Nueva Invitación!</h2>
+    <p class="text-gray-600 font-medium text-sm mb-6">
+      La organización <span class="font-black text-purple-700 uppercase tracking-wide">{{ pendingInvitations[0].companyName }}</span> te ha invitado a unirte a su entorno de bienestar.
+    </p>
+    
+    <div class="flex flex-col w-full gap-3">
+      <button (click)="respondInvitation(pendingInvitations[0].id, true)" class="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-bold transition-colors shadow-md text-sm">
+        Aceptar e Ingresar
+      </button>
+      <button (click)="respondInvitation(pendingInvitations[0].id, false)" class="w-full py-3 bg-gray-50 hover:bg-gray-100 text-gray-500 hover:text-gray-700 rounded-xl font-bold transition-colors text-sm border border-gray-200">
+        Rechazar
+      </button>
+    </div>
   </div>
 </div>

@@ -6,6 +6,7 @@ import TuskSyS.bienestar_api.modules.users.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -14,6 +15,7 @@ import java.util.UUID;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final TuskSyS.bienestar_api.modules.companies.repositories.CompanyInvitationRepository invitationRepository;
 
     public User getUserProfile(UUID userId) {
         return userRepository.findById(userId)
@@ -61,5 +63,46 @@ public class UserService {
             "currentStreak", currentStreak,
             "streakAtRisk", (!alreadyDidBreakToday && currentStreak > 0)
         );
+    }
+
+    // ==========================================
+    // 📩 VER INVITACIONES PENDIENTES DEL USUARIO
+    // ==========================================
+    public List<TuskSyS.bienestar_api.modules.companies.dtos.InvitationResponseDTO> getPendingInvitations(String email) {
+        return invitationRepository.findByInviteeEmailAndStatus(email, "PENDING").stream()
+                .map(inv -> TuskSyS.bienestar_api.modules.companies.dtos.InvitationResponseDTO.builder()
+                        .id(inv.getId())
+                        .companyName(inv.getCompany().getName())
+                        .invitedAt(inv.getInvitedAt())
+                        .build())
+                .collect(java.util.stream.Collectors.toList());
+    }
+
+    // ==========================================
+    // ✅ RESPONDER A LA INVITACIÓN (Aceptar/Rechazar)
+    // ==========================================
+    public String respondToInvitation(UUID userId, UUID invitationId, boolean accept) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        TuskSyS.bienestar_api.modules.companies.entities.CompanyInvitation invitation = invitationRepository.findById(invitationId)
+                .orElseThrow(() -> new RuntimeException("Invitación no encontrada"));
+
+        // Validar que la invitación sea realmente para este correo
+        if (!invitation.getInviteeEmail().equalsIgnoreCase(user.getEmail())) {
+            throw new RuntimeException("Esta invitación no te pertenece.");
+        }
+
+        if (accept) {
+            invitation.setStatus("ACCEPTED");
+            user.setCompany(invitation.getCompany());
+            userRepository.save(user); // Actualizamos la empresa del usuario
+        } else {
+            invitation.setStatus("REJECTED");
+        }
+        
+        invitationRepository.save(invitation);
+
+        return accept ? "¡Bienvenido a " + invitation.getCompany().getName() + "!" : "Invitación rechazada.";
     }
 }

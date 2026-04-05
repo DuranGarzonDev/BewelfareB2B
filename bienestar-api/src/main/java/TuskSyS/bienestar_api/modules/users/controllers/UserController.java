@@ -7,9 +7,11 @@ import java.util.stream.Collectors;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import TuskSyS.bienestar_api.modules.users.dtos.LeaderboardDTO;
@@ -73,5 +75,29 @@ public class UserController {
     @GetMapping("/{userId}/streak-status")
     public ResponseEntity<?> getStreakStatus(@PathVariable UUID userId) {
         return ResponseEntity.ok(userService.getStreakStatus(userId));
+    }
+
+    // ==========================================
+    // 📩 ENDPOINT: VER INVITACIONES
+    // ==========================================
+    @GetMapping("/{email}/invitations")
+    public ResponseEntity<List<TuskSyS.bienestar_api.modules.companies.dtos.InvitationResponseDTO>> getInvitations(@PathVariable String email) {
+        return ResponseEntity.ok(userService.getPendingInvitations(email));
+    }
+
+    // ==========================================
+    // ✅ ENDPOINT: RESPONDER INVITACIÓN
+    // ==========================================
+    @PostMapping("/{userId}/invitations/{invitationId}")
+    public ResponseEntity<?> respondToInvitation(
+            @PathVariable UUID userId,
+            @PathVariable UUID invitationId,
+            @RequestParam boolean accept) {
+        try {
+            String message = userService.respondToInvitation(userId, invitationId, accept);
+            return ResponseEntity.ok(java.util.Map.of("message", message));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(java.util.Map.of("error", e.getMessage()));
+        }
     }
 }

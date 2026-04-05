@@ -61,8 +61,8 @@
       <div class="flex items-center gap-4 bg-gray-50 md:bg-transparent p-3 md:p-0 rounded-xl md:rounded-none border md:border-transparent border-gray-100">
         <div class="text-right">
           <p class="text-sm font-bold text-gray-900">{{ userName }}</p>
-          <p class="text-xs font-bold text-red-700 bg-red-50 inline-block px-2 py-1 rounded-full mt-1 border border-red-100">
-            {{ role === 'EMPLOYEE' ? 'Empleado' : role }}
+          <p *ngIf="role !== 'EMPLOYEE'" class="text-xs font-bold text-white bg-slate-900 inline-block px-3 py-1 rounded-full mt-1 uppercase tracking-widest shadow-sm">
+            {{ role }}
           </p>
         </div>
         <div class="h-10 w-10 md:h-12 md:w-12 rounded-full bg-red-100 border-2 border-red-200 flex justify-center items-center text-red-700 font-bold text-lg md:text-xl uppercase shadow-sm shrink-0 overflow-hidden">

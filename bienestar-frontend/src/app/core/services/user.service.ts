@@ -41,4 +41,21 @@ export class UserService {
   getStreakStatus(userId: string): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/${userId}/streak-status`, { headers: this.getHeaders() });
   }
+
+  // ==========================================
+  // 📩 SISTEMA DE INVITACIONES CORPORATIVAS
+  // ==========================================
+  getPendingInvitations(email: string): Observable<any> {
+    const headers = new HttpHeaders({ 'Authorization': `Bearer ${localStorage.getItem('token')}` });
+    return this.http.get<any>(`http://localhost:8080/api/users/${email}/invitations`, { headers });
+  }
+
+  respondToInvitation(userId: string, invitationId: string, accept: boolean): Observable<any> {
+    const headers = new HttpHeaders({ 'Authorization': `Bearer ${localStorage.getItem('token')}` });
+    return this.http.post<any>(
+      `http://localhost:8080/api/users/${userId}/invitations/${invitationId}?accept=${accept}`, 
+      {}, 
+      { headers }
+    );
+  }
 }
