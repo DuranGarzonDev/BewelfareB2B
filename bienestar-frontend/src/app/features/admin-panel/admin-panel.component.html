@@ -55,97 +55,159 @@
 
   <main class="flex-1 h-full overflow-y-auto p-4 md:p-8 bg-gray-50">
     
-    <header class="flex flex-col md:flex-row md:justify-between md:items-center bg-white p-5 md:p-6 rounded-2xl shadow-sm mb-6 md:mb-8 border border-gray-100 gap-4">
+    <header class="flex flex-col md:flex-row md:justify-between md:items-center bg-white p-5 md:p-6 rounded-2xl shadow-sm mb-6 border border-gray-100 gap-4">
       <div>
         <h1 class="text-2xl md:text-3xl font-black text-slate-900 flex items-center gap-3">
-          <svg class="w-7 h-7 md:w-8 md:h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-          Gestión de Plataforma
+          <svg class="w-7 h-7 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+          Centro de Mando
         </h1>
-        <p class="text-gray-500 mt-1 font-medium text-sm md:text-base">Agrega nuevas categorías y pausas activas al sistema.</p>
+        <p class="text-gray-500 mt-1 font-medium text-sm">
+          <span *ngIf="isLoadingStats" class="animate-pulse">Cargando métricas...</span>
+          <span *ngIf="!isLoadingStats">Métricas de <span class="font-bold text-red-700">{{ companyName }}</span></span>
+        </p>
       </div>
       
       <div class="flex items-center gap-4 bg-gray-50 md:bg-transparent p-3 md:p-0 rounded-xl md:rounded-none border md:border-transparent border-gray-100">
         <div class="text-right">
           <p class="text-sm font-bold text-gray-900">{{ userName }}</p>
-          <p class="text-xs font-bold text-white bg-slate-900 inline-block px-3 py-1 rounded-full mt-1 uppercase tracking-widest shadow-sm">
-            {{ role }}
-          </p>
+          <p class="text-xs font-bold text-white bg-slate-900 inline-block px-3 py-1 rounded-full mt-1 uppercase tracking-widest">{{ role }}</p>
         </div>
-        <div class="h-10 w-10 md:h-12 md:w-12 rounded-full bg-slate-100 border-2 border-slate-300 flex justify-center items-center text-slate-800 font-bold text-lg md:text-xl uppercase shadow-sm shrink-0">
-          {{ userName ? userName.charAt(0) : 'A' }}
+        <div class="h-10 w-10 md:h-12 md:w-12 rounded-full bg-slate-100 border-2 border-slate-300 flex justify-center items-center text-slate-800 font-bold text-lg md:text-xl uppercase shadow-sm shrink-0 overflow-hidden">
+          <img *ngIf="profilePic" [src]="profilePic" alt="Avatar" class="w-full h-full object-cover">
+          <span *ngIf="!profilePic">{{ userName ? userName.charAt(0) : 'A' }}</span>
         </div>
       </div>
     </header>
 
-    <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 md:gap-8">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 relative overflow-hidden">
+        <h3 class="text-gray-500 text-sm font-bold uppercase tracking-wider mb-2 flex items-center gap-2"><span>👥</span> {{ role === 'SUPERADMIN' ? 'Total Usuarios' : 'Total Empleados' }}</h3>
+        <p class="text-4xl md:text-5xl font-black text-slate-900">{{ totalEmployees }}</p>
+      </div>
+      <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 relative overflow-hidden">
+        <h3 class="text-gray-500 text-sm font-bold uppercase tracking-wider mb-2 flex items-center gap-2"><span>🧘‍♂️</span> Pausas Completadas</h3>
+        <p class="text-4xl md:text-5xl font-black text-slate-900">{{ totalBreaks }}</p>
+      </div>
+      <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 relative overflow-hidden">
+        <h3 class="text-gray-500 text-sm font-bold uppercase tracking-wider mb-2 flex items-center gap-2"><span>🪙</span> Monedas en Circulación</h3>
+        <p class="text-4xl md:text-5xl font-black text-slate-900">{{ totalCoins }}</p>
+      </div>
+    </div>
+
+    <h2 class="text-xl font-black text-slate-900 mb-4 border-b border-gray-200 pb-2">Acciones Administrativas</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       
-      <div class="bg-white p-6 md:p-8 rounded-2xl md:rounded-3xl shadow-sm border border-gray-100 h-fit">
-        <h2 class="text-lg md:text-xl font-black text-slate-900 mb-6 border-b border-gray-100 pb-4">Crear Nueva Categoría</h2>
-        
-        <form (ngSubmit)="saveCategory()" class="space-y-5">
-          <div>
-            <label class="block text-sm font-bold text-gray-700 mb-2">Nombre de la Categoría</label>
-            <input type="text" [(ngModel)]="newCategory.name" name="catName" required class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl shadow-sm focus:bg-white focus:ring-2 focus:ring-red-600 focus:border-red-600 outline-none transition-all font-medium text-gray-800" placeholder="Ej. Estiramiento Físico">
-          </div>
-          <div>
-            <label class="block text-sm font-bold text-gray-700 mb-2">Descripción</label>
-            <textarea [(ngModel)]="newCategory.description" name="catDesc" rows="3" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl shadow-sm focus:bg-white focus:ring-2 focus:ring-red-600 focus:border-red-600 outline-none transition-all font-medium text-gray-800" placeholder="Breve descripción..."></textarea>
-          </div>
-          <button type="submit" class="w-full py-3 md:py-3.5 bg-red-700 hover:bg-red-800 text-white rounded-xl font-bold transition-colors shadow-md text-sm md:text-base">
-            Guardar Categoría
-          </button>
-        </form>
-      </div>
+      <button (click)="manageUsers()" class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm hover:shadow-md hover:border-red-300 transition-all text-left flex flex-col gap-3 group">
+        <div class="bg-blue-100 text-blue-600 p-3 rounded-full w-fit group-hover:scale-110 transition-transform">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+        </div>
+        <div>
+          <h3 class="font-bold text-slate-900">{{ role === 'SUPERADMIN' ? 'Ver Usuarios' : 'Ver Empleados' }}</h3>
+          <p class="text-xs text-gray-500">{{ role === 'SUPERADMIN' ? 'Gestión global y corporaciones' : 'Gestionar plantilla' }}</p>
+        </div>
+      </button>
 
-      <div class="bg-white p-6 md:p-8 rounded-2xl md:rounded-3xl shadow-sm border border-gray-100 h-fit">
-        <h2 class="text-lg md:text-xl font-black text-slate-900 mb-6 border-b border-gray-100 pb-4">Agregar Pausa Activa</h2>
-        
-        <form (ngSubmit)="saveBreak()" class="space-y-5">
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-5">
-            <div class="sm:col-span-2">
-              <label class="block text-sm font-bold text-gray-700 mb-2">Título</label>
-              <input type="text" [(ngModel)]="newBreak.title" name="breakTitle" required class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl shadow-sm focus:bg-white focus:ring-2 focus:ring-red-600 focus:border-red-600 outline-none transition-all font-medium text-gray-800" placeholder="Ej. Rotación de Cuello">
-            </div>
-            
-            <div>
-              <label class="block text-sm font-bold text-gray-700 mb-2">Categoría</label>
-              <select [(ngModel)]="newBreak.categoryId" name="breakCategory" required class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl shadow-sm focus:bg-white focus:ring-2 focus:ring-red-600 focus:border-red-600 outline-none transition-all font-medium text-gray-800">
-                <option [ngValue]="null" disabled>Selecciona una...</option>
-                <option *ngFor="let cat of categories" [value]="cat.id">{{ cat.name }}</option>
-              </select>
-            </div>
+      <button (click)="openInviteModal()" class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm hover:shadow-md hover:border-red-300 transition-all text-left flex flex-col gap-3 group">
+        <div class="bg-purple-100 text-purple-600 p-3 rounded-full w-fit group-hover:scale-110 transition-transform">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+        </div>
+        <div>
+          <h3 class="font-bold text-slate-900">Invitar Empleado</h3>
+          <p class="text-xs text-gray-500">Enviar enlace de unión</p>
+        </div>
+      </button>
 
-            <div>
-              <label class="block text-sm font-bold text-gray-700 mb-2">Duración (segundos)</label>
-              <input type="number" [(ngModel)]="newBreak.durationSeconds" name="breakDuration" required class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl shadow-sm focus:bg-white focus:ring-2 focus:ring-red-600 focus:border-red-600 outline-none transition-all font-medium text-gray-800">
-            </div>
+      <button (click)="openCategoryModal()" class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm hover:shadow-md hover:border-red-300 transition-all text-left flex flex-col gap-3 group">
+        <div class="bg-orange-100 text-orange-600 p-3 rounded-full w-fit group-hover:scale-110 transition-transform">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
+        </div>
+        <div>
+          <h3 class="font-bold text-slate-900">Nueva Categoría</h3>
+          <p class="text-xs text-gray-500">Clasifica el bienestar</p>
+        </div>
+      </button>
 
-            <div class="sm:col-span-2">
-              <label class="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
-                <span class="text-yellow-500 text-lg">🪙</span> Recompensa (Coins)
-              </label>
-              <input type="number" [(ngModel)]="newBreak.coinReward" name="coinReward" min="1" required 
-                class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl shadow-sm focus:bg-white focus:ring-2 focus:ring-red-600 focus:border-red-600 outline-none transition-all font-medium text-gray-800">
-              <p class="text-xs text-gray-500 mt-1 font-medium">Define cuántas monedas ganará el usuario al completar esta pausa.</p>
-            </div>
-          </div>
-
-          <div>
-            <label class="block text-sm font-bold text-gray-700 mb-2">URL de la Imagen (Icono)</label>
-            <input type="text" [(ngModel)]="newBreak.mediaUrl" name="breakImage" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl shadow-sm focus:bg-white focus:ring-2 focus:ring-red-600 focus:border-red-600 outline-none transition-all font-medium text-gray-800" placeholder="https://ejemplo.com/icono.png">
-          </div>
-
-          <div>
-            <label class="block text-sm font-bold text-gray-700 mb-2">Instrucciones</label>
-            <textarea [(ngModel)]="newBreak.description" name="breakDesc" rows="2" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl shadow-sm focus:bg-white focus:ring-2 focus:ring-red-600 focus:border-red-600 outline-none transition-all font-medium text-gray-800" placeholder="Pasos a seguir..."></textarea>
-          </div>
-
-          <button type="submit" class="w-full py-3 md:py-3.5 bg-slate-900 hover:bg-black text-white rounded-xl font-bold transition-colors shadow-md text-sm md:text-base">
-            Publicar Pausa Activa
-          </button>
-        </form>
-      </div>
+      <button (click)="openBreakModal()" class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm hover:shadow-md hover:border-red-300 transition-all text-left flex flex-col gap-3 group">
+        <div class="bg-green-100 text-green-600 p-3 rounded-full w-fit group-hover:scale-110 transition-transform">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+        </div>
+        <div>
+          <h3 class="font-bold text-slate-900">Nueva Pausa Activa</h3>
+          <p class="text-xs text-gray-500">Agrega al catálogo</p>
+        </div>
+      </button>
 
     </div>
   </main>
+</div>
+
+<div *ngIf="isCategoryModalOpen" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/70 backdrop-blur-sm p-4">
+  <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md p-6 relative">
+    <button (click)="closeCategoryModal()" class="absolute top-4 right-4 text-gray-400 hover:bg-gray-100 rounded-full p-2"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+    <h2 class="text-xl font-black text-slate-900 mb-6">Crear Categoría</h2>
+    <form (ngSubmit)="saveCategory()" class="space-y-4">
+      <div>
+        <label class="block text-sm font-bold text-gray-700 mb-1">Nombre</label>
+        <input type="text" [(ngModel)]="newCategory.name" name="catName" required class="w-full px-4 py-2 border rounded-xl" placeholder="Ej. Visual">
+      </div>
+      <div>
+        <label class="block text-sm font-bold text-gray-700 mb-1">Descripción</label>
+        <textarea [(ngModel)]="newCategory.description" name="catDesc" rows="3" class="w-full px-4 py-2 border rounded-xl" placeholder="..."></textarea>
+      </div>
+      <button type="submit" class="w-full py-3 bg-red-700 text-white rounded-xl font-bold">Guardar</button>
+    </form>
+  </div>
+</div>
+
+<div *ngIf="isBreakModalOpen" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/70 backdrop-blur-sm p-4">
+  <div class="bg-white rounded-3xl shadow-2xl w-full max-w-2xl p-6 relative max-h-[90vh] overflow-y-auto">
+    <button (click)="closeBreakModal()" class="absolute top-4 right-4 text-gray-400 hover:bg-gray-100 rounded-full p-2"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+    <h2 class="text-xl font-black text-slate-900 mb-6">Agregar Pausa Activa</h2>
+    <form (ngSubmit)="saveBreak()" class="space-y-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="sm:col-span-2">
+          <label class="block text-sm font-bold text-gray-700 mb-1">Título</label>
+          <input type="text" [(ngModel)]="newBreak.title" name="breakTitle" required class="w-full px-4 py-2 border rounded-xl">
+        </div>
+        <div>
+          <label class="block text-sm font-bold text-gray-700 mb-1">Categoría</label>
+          <select [(ngModel)]="newBreak.categoryId" name="breakCategory" required class="w-full px-4 py-2 border rounded-xl">
+            <option [ngValue]="null" disabled>Selecciona...</option>
+            <option *ngFor="let cat of categories" [value]="cat.id">{{ cat.name }}</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-bold text-gray-700 mb-1">Duración (s)</label>
+          <input type="number" [(ngModel)]="newBreak.durationSeconds" name="breakDur" required class="w-full px-4 py-2 border rounded-xl">
+        </div>
+        <div class="sm:col-span-2">
+          <label class="block text-sm font-bold text-gray-700 mb-1 flex items-center gap-1"><span class="text-yellow-500">🪙</span> Recompensa (Coins)</label>
+          <input type="number" [(ngModel)]="newBreak.coinReward" name="coinRew" min="1" required class="w-full px-4 py-2 border rounded-xl">
+        </div>
+        <div class="sm:col-span-2">
+          <label class="block text-sm font-bold text-gray-700 mb-1">URL Imagen</label>
+          <input type="text" [(ngModel)]="newBreak.mediaUrl" name="imgUrl" class="w-full px-4 py-2 border rounded-xl">
+        </div>
+        <div class="sm:col-span-2">
+          <label class="block text-sm font-bold text-gray-700 mb-1">Instrucciones</label>
+          <textarea [(ngModel)]="newBreak.description" name="breakDesc" rows="2" class="w-full px-4 py-2 border rounded-xl"></textarea>
+        </div>
+      </div>
+      <button type="submit" class="w-full py-3 bg-slate-900 text-white rounded-xl font-bold mt-4">Publicar Pausa</button>
+    </form>
+  </div>
+</div>
+
+<div *ngIf="isInviteModalOpen" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/70 backdrop-blur-sm p-4">
+  <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm p-6 relative text-center">
+    <button (click)="closeInviteModal()" class="absolute top-4 right-4 text-gray-400 hover:bg-gray-100 rounded-full p-2"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+    <div class="w-16 h-16 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mx-auto mb-4"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg></div>
+    <h2 class="text-xl font-black text-slate-900 mb-2">Invitar a la Empresa</h2>
+    <p class="text-xs text-gray-500 mb-6">Enviaremos una solicitud de unión al usuario. Deberá aceptarla en su perfil.</p>
+    
+    <form (ngSubmit)="sendInvite()" class="space-y-4">
+      <input type="email" [(ngModel)]="newInvite.email" name="inviteEmail" required class="w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-50 text-sm font-medium" placeholder="correo@ejemplo.com">
+      <button type="submit" class="w-full py-3 bg-purple-600 text-white rounded-xl font-bold">Enviar Invitación</button>
+    </form>
+  </div>
 </div>

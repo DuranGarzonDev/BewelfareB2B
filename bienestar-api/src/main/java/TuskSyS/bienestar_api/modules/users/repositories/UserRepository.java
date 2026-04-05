@@ -26,4 +26,10 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     List<User> findTop10ByCompanyOrderByCoinsDesc(Company company);
     
     List<User> findTop10ByCompanyIsNullOrderByCoinsDesc();
+
+    // ==========================================
+    // 📊 ESTADÍSTICAS B2B
+    // ==========================================
+    long countByCompany(TuskSyS.bienestar_api.modules.companies.entities.Company company);
+    List<User> findByCompany(TuskSyS.bienestar_api.modules.companies.entities.Company company);
 }

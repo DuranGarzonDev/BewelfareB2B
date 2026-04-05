@@ -44,9 +44,6 @@ public class BreakService {
     }
 
     // ==========================================
-    // CREAR PAUSA ACTIVA (Adaptado a Payload)
-    // ==========================================
-    // ==========================================
     // CREAR PAUSA ACTIVA (Parseo Seguro)
     // ==========================================
     public ActiveBreak createBreak(Map<String, Object> payload, Long categoryId, UUID userId) {
@@ -127,7 +124,10 @@ public class BreakService {
         user.setLastBreakDate(today);
         userRepository.save(user);
 
-        int totalBreaksCount = (int) userBreakRepository.countByUserId(userId);
+        // 👇 LA CORRECCIÓN DEFINITIVA 👇
+        long rawCount = userBreakRepository.countByUserId(userId);
+        int totalBreaksCount = Math.toIntExact(rawCount); // Convierte long a int de forma segura
+        
         achievementService.checkAndGrantAchievements(user, totalBreaksCount);
 
         return record;
